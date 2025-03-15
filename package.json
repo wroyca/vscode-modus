@@ -9,13 +9,91 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "themes": [
+      {
+        "label": "Modus Operandi",
+        "uiTheme": "vs",
+        "path": "./themes/modus-operandi-color-theme.json"
+      },
+      {
+        "label": "Modus Operandi Tritanopia",
+        "uiTheme": "vs",
+        "path": "./themes/modus-operandi-tritanopia-color-theme.json"
+      },
+      {
+        "label": "Modus Operandi Tinted",
+        "uiTheme": "vs",
+        "path": "./themes/modus-operandi-tinted-color-theme.json"
+      },
+      {
+        "label": "Modus Operandi Deuteranopia",
+        "uiTheme": "vs",
+        "path": "./themes/modus-operandi-deuteranopia-color-theme.json"
+      },
+      {
+        "label": "Modus Vivendi",
+        "uiTheme": "vs-dark",
+        "path": "./themes/modus-vivendi-color-theme.json"
+      },
+      {
+        "label": "Modus Vivendi Deuteranopia",
+        "uiTheme": "vs-dark",
+        "path": "./themes/modus-vivendi-deuteranopia-color-theme.json"
+      },
+      {
+        "label": "Modus Vivendi Tritanopia",
+        "uiTheme": "vs-dark",
+        "path": "./themes/modus-vivendi-tritanopia-color-theme.json"
+      },
+      {
+        "label": "Modus Vivendi Tinted",
+        "uiTheme": "vs-dark",
+        "path": "./themes/modus-vivendi-tinted-color-theme.json"
+      }
+    ],
+    "configuration": {
+      "title": "Modus Themes",
+      "properties": {
+        "modus.boldKeywords": {
+          "type": "boolean",
+          "default": false,
+          "description": "Controls whether keywords use bold styling"
+        },
+        "modus.italicComments": {
+          "type": "boolean",
+          "default": true,
+          "description": "Controls whether comments use italic styling"
+        },
+        "modus.useSemanticHighlighting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Controls whether semantic highlighting is enabled"
+        },
+        "modus.debugMode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable additional debug output in the Output panel"
+        },
+        "modus.colorOverrides": {
+          "type": "object",
+          "default": {},
+          "description": "User-defined color overrides (format: \"color-name\": \"#RRGGBB\" or \"color-name\": \"semantic-name\")",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^(#[0-9A-Fa-f]{6}|[a-zA-Z0-9-]+)$"
+          }
+        }
+      }
+    },
     "commands": [
       {
-        "command": "modus.helloWorld",
-        "title": "Hello World"
+        "command": "modus.reloadWindow",
+        "title": "Modus Themes: Reload Window to Apply Changes"
       }
     ]
   },
