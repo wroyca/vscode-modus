@@ -1,13 +1,23 @@
 {
   "name": "modus",
-  "displayName": "modus",
+  "displayName": "Modus",
+  "publisher": "wroyca",
+  "license": "MIT",
+  "preview": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wroyca/modus.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wroyca/modus/issues"
+  },
   "description": "Highly accessible themes for Visual Studio Code",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.98.0"
   },
   "categories": [
-    "Other"
+    "Themes"
   ],
   "activationEvents": [
     "onStartupFinished"
