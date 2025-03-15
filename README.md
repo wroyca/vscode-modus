@@ -1,71 +1,91 @@
-# modus README
+# Modus
 
-This is the README for your extension "modus". After writing up a brief description, we recommend including the following sections.
+> *Bringing Protesilaos Stavrou's acclaimed Emacs themes to Visual Studio Code*
 
-## Features
+![operandi](.github/modus-operandi-theme.png#gh-light-mode-only)
+![vivendi](.github/modus-vivendi-theme.png#gh-dark-mode-only)
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## What makes Modus special?
 
-For example if there is an image subfolder under your extension project workspace:
+Modus themes are built on principles of accessibility and thoughtful design:
 
-\!\[feature X\]\(images/feature-x.png\)
+- ✨ **Perfect clarity** with 7:1+ contrast ratios (WCAG AAA compliant)
+- 🌈 **Inclusive design** with variants for different color vision needs
+- 🎨 **Thoughtful aesthetics** that maintain readability without sacrificing beauty
+- 🔄 **Consistent patterns** that help you understand code at a glance
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Theme Family
 
-## Requirements
+Choose the theme that works best for you:
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+| Theme | Mood | Best for |
+|-------|------|----------|
+| **Modus Operandi** | Bright & clear | Daytime coding, bright environments |
+| **Modus Vivendi** | Deep & focused | Evening sessions, reduced glare |
+| **Tinted variants** | Warm & gentle | Extended use, reduced eye strain |
+| **Deuteranopia variants** | Optimized | Red-green color vision differences |
+| **Tritanopia variants** | Optimized | Blue-yellow color vision differences |
 
-## Extension Settings
+Each theme maintains the same commitment to accessibility while offering a unique character to suit your preferences and needs.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## Getting Started
 
-For example:
+### Installation
 
-This extension contributes the following settings:
+```
+Ctrl+P → ext install modus
+```
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+Or download from the [releases page](https://github.com/wroyca/modus/releases/latest) and install manually.
 
-## Known Issues
+### Selecting Your Theme
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+1. Press `Ctrl+K` then `Ctrl+T` (or `Cmd+K` then `Cmd+T` on macOS)
+2. Type "Modus" to filter the theme list
+3. Select your preferred variant
 
-## Release Notes
+## Make It Yours
 
-Users appreciate release notes as you update your extension.
+Customize your Modus experience with these settings:
 
-### 1.0.0
+```json
+{
+  "modus.boldKeywords": false,    // Add emphasis to keywords
+  "modus.italicComments": true,   // Give comments a distinct style
+  "modus.colorOverrides": {}      // Your personal color adjustments
+}
+```
 
-Initial release of ...
+After changing settings, run `Modus Themes: Reload Window to Apply Changes` for them to take effect.
 
-### 1.0.1
+## Behind the Scenes
 
-Fixed issue #.
+Curious how Modus brings Emacs themes to VS Code? Here's a simplified view:
 
-### 1.1.0
+```mermaid
+graph TD
+    A[Emacs Lisp Source Files] -->|Parse & Extract| B[Color Palette Dictionary]
+    A -->|Parse & Extract| C[Emacs Face Definitions]
 
-Added features X, Y, and Z.
+    D[Manual Token Mapping] -->|Connect VS Code tokens<br>to Modus colors| E[Theme Generator]
+    B --> E
 
----
+    E -->|Generate| F[VS Code Theme Files]
 
-## Following extension guidelines
+    G[User Settings] -->|Apply| E
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+    subgraph "Automatic Process"
+        A
+        B
+        C
+        F
+    end
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+    subgraph "Manual Process"
+        D
+    end
+```
 
-## Working with Markdown
+## With Gratitude
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+This project wouldn't exist without [Protesilaos Stavrou](https://protesilaos.com/), who created the [original Modus themes](https://protesilaos.com/emacs/modus-themes) for Emacs. We do our best to honor the principles and attention to detail that make the original themes so special.
