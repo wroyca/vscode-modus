@@ -740,92 +740,13 @@ class ThemeParser implements IThemeParser {
 
 /**
  * TextMate scope mappings for syntax highlighting
+ *
+ * Tokens auto-generated from https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide#standard-token-types-and-modifiers
+ *
  * @const
  * @readonly
  */
-const TEXTMATE_SCOPE_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  // Comments
-  'comment': Object.freeze(['fg-dim']), // Comments in source code
-  'punctuation.definition.comment': Object.freeze(['fg-dim']), // Punctuation that defines comments
-
-  // Strings
-  'string': Object.freeze(['green']), // String literals
-  'string.quoted': Object.freeze(['green']), // Quoted strings
-
-  // Keywords and control flow
-  'keyword': Object.freeze(['blue']), // Language keywords
-  'storage': Object.freeze(['blue']), // Storage modifiers and types
-
-  // Variables
-  'variable': Object.freeze(['fg-main']), // Variable names
-  'variable.other.constant': Object.freeze(['cyan']), // Constant variables
-  'variable.language': Object.freeze(['magenta']), // Language variables like this, super
-
-  // Functions
-  'entity.name.function': Object.freeze(['cyan']), // Function names
-  'support.function': Object.freeze(['cyan']), // Built-in functions
-
-  // Types
-  'entity.name.type': Object.freeze(['yellow']), // Type names
-  'entity.other.inherited-class': Object.freeze(['yellow']), // Inherited class names
-
-  // Tags and markdown
-  'entity.name.tag': Object.freeze(['magenta']), // HTML/XML tags
-  'markup.heading': Object.freeze(['blue-intense']), // Markdown headings
-
-  // Types and classes
-  'support.type': Object.freeze(['yellow']), // Built-in types
-  'support.class': Object.freeze(['yellow']), // Built-in classes
-
-  // Constants and numerics
-  'constant.numeric': Object.freeze(['magenta']), // Numeric literals
-  'constant.language': Object.freeze(['magenta']), // Language constants like null, undefined
-  'support.constant': Object.freeze(['magenta']), // Built-in constant values
-
-  // Markup
-  'markup.inline.raw': Object.freeze(['green']), // Inline code in markdown
-  'markup.fenced_code': Object.freeze(['green']), // Fenced code blocks
-
-  // Errors
-  'invalid': Object.freeze(['red']), // Invalid constructs
-  'message.error': Object.freeze(['red']), // Error messages
-
-  // Diffs and changes
-  'markup.changed': Object.freeze(['yellow']), // Changed content in diffs
-  'meta.diff.header': Object.freeze(['blue']), // Diff headers
-  'markup.inserted': Object.freeze(['green']), // Inserted content in diffs
-  'meta.diff.header.to-file': Object.freeze(['green']), // Destination file header
-  'markup.deleted': Object.freeze(['red']), // Deleted content in diffs
-  'meta.diff.header.from-file': Object.freeze(['red']), // Source file header
-
-  // Text styling
-  'markup.italic': Object.freeze(['fg-main']), // Italic text with styling
-  'markup.bold': Object.freeze(['fg-main']), // Bold text with styling
-  'punctuation.definition.bold': Object.freeze(['fg-dim']), // Punctuation for bold text
-
-  // Selectors
-  'meta.selector': Object.freeze(['blue']), // CSS selectors
-  'meta.object-literal.key': Object.freeze(['blue']), // Object literal keys
-
-  // Properties and attributes
-  'meta.property-name': Object.freeze(['cyan']), // Property names
-  'entity.name.section': Object.freeze(['blue']), // Section names
-  'support.variable': Object.freeze(['fg-main']), // Built-in variables
-  'variable.parameter': Object.freeze(['yellow-warmer']), // Function parameters
-  'entity.other.attribute-name': Object.freeze(['magenta']), // HTML/XML attributes
-
-  // Additional mappings
-  'punctuation': Object.freeze(['fg-dim']), // Punctuation characters
-  'delimiter': Object.freeze(['fg-dim']), // Delimiters like brackets
-  'operator': Object.freeze(['cyan']), // Operators
-  'bracket': Object.freeze(['fg-dim']), // Brackets and parentheses
-  'builtin': Object.freeze(['magenta']), // Built-in language constructs
-  'docmarkup': Object.freeze(['fg-dim']), // Documentation markup
-  'docstring': Object.freeze(['green']), // Documentation strings
-  'preprocessor': Object.freeze(['magenta']), // Preprocessor directives
-  'rx-backslash': Object.freeze(['red']), // Regex escape characters
-  'rx-construct': Object.freeze(['cyan']) // Regex special constructs
-});
+const TEXTMATE_SCOPE_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.freeze({});
 
 /**
  * VS Code UI color mappings
@@ -1897,6 +1818,40 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
 });
 
 /**
+ * Semantic token mappings
+ *
+ * Tokens auto-generated from https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide#standard-token-types-and-modifiers
+ *
+ * @const
+ * @readonly
+ */
+const SEMANTIC_TOKEN_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  'namespace':      Object.freeze(['']), // For identifiers that declare or reference a namespace, module, or package.
+  'class':          Object.freeze(['']), // For identifiers that declare or reference a class type.
+  'enum':           Object.freeze(['']), // For identifiers that declare or reference an enumeration type.
+  'interface':      Object.freeze(['']), // For identifiers that declare or reference an interface type.
+  'struct':         Object.freeze(['']), // For identifiers that declare or reference a struct type.
+  'typeParameter':  Object.freeze(['']), // For identifiers that declare or reference a type parameter.
+  'type':           Object.freeze(['']), // For identifiers that declare or reference a type that is not covered above.
+  'parameter':      Object.freeze(['']), // For identifiers that declare or reference a function or method parameters.
+  'variable':       Object.freeze(['']), // For identifiers that declare or reference a local or global variable.
+  'property':       Object.freeze(['']), // For identifiers that declare or reference a member property, member field, or member variable.
+  'enumMember':     Object.freeze(['']), // For identifiers that declare or reference an enumeration property, constant, or member.
+  'decorator':      Object.freeze(['']), // For identifiers that declare or reference decorators and annotations.
+  'event':          Object.freeze(['']), // For identifiers that declare an event property.
+  'function':       Object.freeze(['magenta']), // For identifiers that declare a function.
+  'method':         Object.freeze(['']), // For identifiers that declare a member function or method.
+  'macro':          Object.freeze(['']), // For identifiers that declare a macro.
+  'label':          Object.freeze(['']), // For identifiers that declare a label.
+  'comment':        Object.freeze(['fg-dim']), // For tokens that represent a comment.
+  'string':         Object.freeze(['']), // For tokens that represent a string literal.
+  'keyword':        Object.freeze(['']), // For tokens that represent a language keyword.
+  'number':         Object.freeze(['']), // For tokens that represent a number literal.
+  'regexp':         Object.freeze(['']), // For tokens that represent a regular expression literal.
+  'operator':       Object.freeze(['']), // For tokens that represent an operator.
+});
+
+/**
  * Theme definitions
  * @const
  * @readonly
@@ -1975,43 +1930,45 @@ class ThemeGenerator implements IThemeGenerator {
    * @readonly
    */
   private readonly THEME_SPECIFIC_OVERRIDES: Readonly<Record<string, Readonly<Record<string, string>>>> = Object.freeze({
+    // Semantic tokens
+    //
+    'namespace': Object.freeze({ '': '' }),
+    'class': Object.freeze({'': ''}),
+    'enum': Object.freeze({'': ''}),
+    'interface': Object.freeze({'': ''}),
+    'struct': Object.freeze({'': ''}),
+    'typeParameter': Object.freeze({'': ''}),
+    'type': Object.freeze({'': ''}),
+    'parameter': Object.freeze({'': ''}),
+    'variable': Object.freeze({'': ''}),
+    'property': Object.freeze({'': ''}),
+    'enumMember': Object.freeze({'': ''}),
+    'decorator': Object.freeze({'': ''}),
+    'event': Object.freeze({'': ''}),
+
+    'function': Object.freeze({
+      'modus-operandi-tritanopia': 'cyan-warmer',
+      'modus-vivendi-tritanopia': 'cyan-warmer'
+    }),
+
+    'method': Object.freeze({ '': '' }),
+    'macro':  Object.freeze({'': ''}),
+    'label':  Object.freeze({'': ''}),
+
     'comment': Object.freeze({
-      'default': 'fg-dim',
       'modus-operandi-tinted': 'red-faint',
       'modus-vivendi-tinted': 'red-faint',
-      'modus-operandi-deuteranopia': 'blue-faint',
-      'modus-vivendi-deuteranopia': 'blue-faint',
-      'modus-operandi-tritanopia': 'magenta-faint',
-      'modus-vivendi-tritanopia': 'magenta-faint'
+      'modus-operandi-deuteranopia': 'yellow-cooler',
+      'modus-vivendi-deuteranopia': 'yellow-cooler',
+      'modus-operandi-tritanopia': 'red-faint',
+      'modus-vivendi-tritanopia': 'red-faint'
     }),
-    'keyword': Object.freeze({
-      'default': 'magenta-cooler',
-      'modus-operandi-deuteranopia': 'blue-intense',
-      'modus-vivendi-deuteranopia': 'blue-intense',
-      'modus-operandi-tritanopia': 'magenta-intense',
-      'modus-vivendi-tritanopia': 'magenta-intense'
-    }),
-    'string': Object.freeze({
-      'default': 'blue-warmer',
-      'modus-operandi-deuteranopia': 'cyan',
-      'modus-vivendi-deuteranopia': 'cyan',
-      'modus-operandi-tritanopia': 'blue-cooler',
-      'modus-vivendi-tritanopia': 'blue-cooler'
-    }),
-    'entity.name.function': Object.freeze({
-      'default': 'magenta',
-      'modus-operandi-deuteranopia': 'blue',
-      'modus-vivendi-deuteranopia': 'blue',
-      'modus-operandi-tritanopia': 'magenta-intense',
-      'modus-vivendi-tritanopia': 'magenta-intense'
-    }),
-    'entity.name.type': Object.freeze({
-      'default': 'cyan-cooler',
-      'modus-operandi-deuteranopia': 'blue-cooler',
-      'modus-vivendi-deuteranopia': 'blue-cooler',
-      'modus-operandi-tritanopia': 'cyan-cooler',
-      'modus-vivendi-tritanopia': 'cyan-cooler'
-    })
+
+    'string': Object.freeze({'': ''}),
+    'keyword': Object.freeze({'': ''}),
+    'number': Object.freeze({'': ''}),
+    'regexp': Object.freeze({'': ''}),
+    'operator': Object.freeze({'': ''}),
   });
 
   /**
@@ -2067,51 +2024,13 @@ class ThemeGenerator implements IThemeGenerator {
 
       const tokenColors: ITokenStyle[] = [];
       this.processCommentTokens(tokenColors, palette, id, type, italicComments, getColor);
+      this.processTextMateTokens(tokenColors, palette, id, boldKeywords, getColor);
 
-      const scopesByColor = new Map<string, string[]>();
-      for (const [scope, colorNames] of Object.entries(TEXTMATE_SCOPE_MAPPINGS)) {
-        // Special case: Comments are already handled
-        if (scope === 'comment' || scope === 'punctuation.definition.comment') {
-          continue;
-        }
-
-        const overrides = this.THEME_SPECIFIC_OVERRIDES[scope];
-        let colorName: string;
-
-        if (overrides && overrides[id]) {
-          colorName = overrides[id];
-          this.logger.debug(`Applied theme-specific override for ${scope} in ${id}: ${colorName}`);
-        } else if (overrides && overrides['default']) {
-          colorName = overrides['default'];
-        } else if (colorNames.length > 0 && colorNames[0] !== '') {
-          colorName = colorNames[0];
-        } else {
-          continue; // No mapping found or empty value
-        }
-
-        if (!scopesByColor.has(colorName)) {
-          scopesByColor.set(colorName, []);
-        }
-        scopesByColor.get(colorName)!.push(scope);
-      }
-
-      // Generate token colors for each color group
-      for (const [colorName, scopes] of scopesByColor.entries()) {
-        const foreground = getColor(colorName);
-
-        let fontStyle = '';
-        if (boldKeywords &&
-          (colorName === 'magenta-cooler' || colorName === 'magenta-warmer')) {
-          fontStyle = 'bold';
-        }
-
-        tokenColors.push({
-          scope: scopes,
-          settings: {
-            foreground,
-            fontStyle: fontStyle || undefined
-          }
-        });
+      // Process semantic tokens, but only if semantic highlighting is enabled.
+      //
+      const semanticTokenColors: Record<string, string | ITokenStyle['settings']> = {};
+      if (useSemanticHighlighting) {
+        this.processSemanticTokens(semanticTokenColors, palette, id, boldKeywords, italicComments, getColor);
       }
 
       this.logger.info(`Generated theme: ${name}`);
@@ -2121,7 +2040,8 @@ class ThemeGenerator implements IThemeGenerator {
         type,
         colors: Object.freeze(colors),
         tokenColors: Object.freeze(tokenColors),
-        semanticHighlighting: useSemanticHighlighting
+        semanticHighlighting: useSemanticHighlighting,
+        ...(useSemanticHighlighting ? { semanticTokenColors: Object.freeze(semanticTokenColors) } : {})
       });
     } catch (error) {
       if (error instanceof ModusThemeError) {
@@ -2136,6 +2056,12 @@ class ThemeGenerator implements IThemeGenerator {
 
   /**
    * Process comment tokens with theme-specific overrides
+   *
+   * Comments are handled separately from other tokens because they are a
+   * special case: while they are technically semantic tokens, they are not
+   * processed by the semantic token processor but instead handled by the
+   * TextMate token processor if available.
+   *
    * @private
    * @param tokenColors - Token colors array to append to
    * @param palette - Color palette
@@ -2167,6 +2093,128 @@ class ThemeGenerator implements IThemeGenerator {
         fontStyle: italicComments ? 'italic' : undefined
       }
     });
+  }
+
+  /**
+   * Process TextMate tokens with theme-specific overrides
+   * @private
+   * @param tokenColors - Token colors array to append to
+   * @param palette - Color palette
+   * @param themeId - Theme identifier
+   * @param boldKeywords - Whether keywords should be bold
+   * @param getColor - Function to resolve colors
+   */
+  private processTextMateTokens(
+    tokenColors: ITokenStyle[],
+    palette: IColorPalette,
+    themeId: string,
+    boldKeywords: boolean,
+    getColor: (name: string) => string
+  ): void {
+    const scopesByColor = new Map<string, string[]>();
+
+    for (const [scope, colorNames] of Object.entries(TEXTMATE_SCOPE_MAPPINGS)) {
+      // Skip comments (already handled)
+      if (scope === 'comment' || scope === 'punctuation.definition.comment') {
+        continue;
+      }
+
+      const overrides = this.THEME_SPECIFIC_OVERRIDES[scope];
+      let colorName: string;
+
+      if (overrides && overrides[themeId]) {
+        colorName = overrides[themeId];
+      } else if (overrides && overrides['default']) {
+        colorName = overrides['default'];
+      } else if (colorNames.length > 0 && colorNames[0] !== '') {
+        colorName = colorNames[0];
+      } else {
+        continue;
+      }
+
+      if (!scopesByColor.has(colorName)) {
+        scopesByColor.set(colorName, []);
+      }
+      scopesByColor.get(colorName)!.push(scope);
+    }
+
+    for (const [colorName, scopes] of scopesByColor.entries()) {
+      const foreground = getColor(colorName);
+      const fontStyle = boldKeywords &&
+        (colorName === 'magenta-cooler' || colorName === 'magenta-warmer') ? 'bold' : undefined;
+
+      tokenColors.push({
+        scope: scopes,
+        settings: {
+          foreground,
+          fontStyle
+        }
+      });
+    }
+  }
+
+  /**
+   * Process semantic tokens with theme-specific overrides
+   * @private
+   * @param semanticTokenColors - Semantic token colors record to populate
+   * @param palette - Color palette
+   * @param themeId - Theme identifier
+   * @param boldKeywords - Whether keywords should be bold
+   * @param italicComments - Whether comments should be italic
+   * @param getColor - Function to resolve colors
+   */
+  private processSemanticTokens(
+    semanticTokenColors: Record<string, string | ITokenStyle['settings']>,
+    palette: IColorPalette,
+    themeId: string,
+    boldKeywords: boolean,
+    italicComments: boolean,
+    getColor: (name: string) => string
+  ): void {
+    for (const [token, colorNames] of Object.entries(SEMANTIC_TOKEN_MAPPINGS)) {
+      if (token === 'comment') {
+        continue; // Handle comments separately
+      }
+
+      const overrides = this.THEME_SPECIFIC_OVERRIDES[token];
+      let colorName: string;
+
+      if (overrides && overrides[themeId]) {
+        colorName = overrides[themeId];
+      } else if (overrides && overrides['default']) {
+        colorName = overrides['default'];
+      } else if (colorNames.length > 0 && colorNames[0] !== '') {
+        colorName = colorNames[0];
+      } else {
+        continue;
+      }
+
+      const foreground = getColor(colorName);
+      const fontStyle = boldKeywords &&
+        (colorName === 'magenta-cooler' || colorName === 'magenta-warmer') ? 'bold' : undefined;
+
+      if (fontStyle) {
+        semanticTokenColors[token] = {
+          foreground,
+          fontStyle
+        };
+      } else {
+        semanticTokenColors[token] = foreground;
+      }
+    }
+
+    const commentOverrides = this.THEME_SPECIFIC_OVERRIDES['comment'] || {};
+    const colorName = commentOverrides[themeId] || commentOverrides['default'] || 'fg-dim';
+    const commentColor = getColor(colorName);
+
+    if (italicComments) {
+      semanticTokenColors['comment'] = {
+        foreground: commentColor,
+        fontStyle: 'italic'
+      };
+    } else {
+      semanticTokenColors['comment'] = commentColor;
+    }
   }
 }
 
