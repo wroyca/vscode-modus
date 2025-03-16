@@ -746,7 +746,10 @@ class ThemeParser implements IThemeParser {
  * @const
  * @readonly
  */
-const TEXTMATE_SCOPE_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.freeze({});
+const TEXTMATE_SCOPE_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  'string': Object.freeze(['blue-warmer']), // For tokens that represent a string literal.
+  'keyword': Object.freeze(['magenta-cooler']), // For tokens that represent a language keyword.
+});
 
 /**
  * VS Code UI color mappings
@@ -1832,23 +1835,27 @@ const SEMANTIC_TOKEN_MAPPINGS: Readonly<Record<string, readonly string[]>> = Obj
   'interface':      Object.freeze(['']), // For identifiers that declare or reference an interface type.
   'struct':         Object.freeze(['']), // For identifiers that declare or reference a struct type.
   'typeParameter':  Object.freeze(['']), // For identifiers that declare or reference a type parameter.
-  'type':           Object.freeze(['']), // For identifiers that declare or reference a type that is not covered above.
+  'type':           Object.freeze(['cyan-cooler']), // For identifiers that declare or reference a type that is not covered above.
   'parameter':      Object.freeze(['']), // For identifiers that declare or reference a function or method parameters.
-  'variable':       Object.freeze(['']), // For identifiers that declare or reference a local or global variable.
+  'variable':       Object.freeze(['cyan']), // For identifiers that declare or reference a local or global variable.
   'property':       Object.freeze(['']), // For identifiers that declare or reference a member property, member field, or member variable.
   'enumMember':     Object.freeze(['']), // For identifiers that declare or reference an enumeration property, constant, or member.
   'decorator':      Object.freeze(['']), // For identifiers that declare or reference decorators and annotations.
   'event':          Object.freeze(['']), // For identifiers that declare an event property.
   'function':       Object.freeze(['magenta']), // For identifiers that declare a function.
-  'method':         Object.freeze(['']), // For identifiers that declare a member function or method.
+
+  // @@ Emacs Modus don't have any specific color for method, so we'll use the same color as function.
+  //
+  'method':         Object.freeze(['magenta']), // For identifiers that declare a member function or method.
+
   'macro':          Object.freeze(['']), // For identifiers that declare a macro.
   'label':          Object.freeze(['']), // For identifiers that declare a label.
   'comment':        Object.freeze(['fg-dim']), // For tokens that represent a comment.
-  'string':         Object.freeze(['']), // For tokens that represent a string literal.
-  'keyword':        Object.freeze(['']), // For tokens that represent a language keyword.
-  'number':         Object.freeze(['']), // For tokens that represent a number literal.
-  'regexp':         Object.freeze(['']), // For tokens that represent a regular expression literal.
-  'operator':       Object.freeze(['']), // For tokens that represent an operator.
+  'string':         Object.freeze(['blue-warmer']), // For tokens that represent a string literal.
+  'keyword':        Object.freeze(['magenta-cooler']), // For tokens that represent a language keyword.
+  'number':         Object.freeze(['fg-main']), // For tokens that represent a number literal.
+  'regexp':         Object.freeze(['green-cooler']), // For tokens that represent a regular expression literal.
+  'operator':       Object.freeze(['fg-main']), // For tokens that represent an operator.
 });
 
 /**
@@ -1938,9 +1945,19 @@ class ThemeGenerator implements IThemeGenerator {
     'interface': Object.freeze({'': ''}),
     'struct': Object.freeze({'': ''}),
     'typeParameter': Object.freeze({'': ''}),
-    'type': Object.freeze({'': ''}),
+
+    'type': Object.freeze({
+      'modus-operandi-tritanopia': 'blue-warmer',
+      'modus-vivendi-tritanopia': 'blue-warmer'
+    }),
+
     'parameter': Object.freeze({'': ''}),
-    'variable': Object.freeze({'': ''}),
+
+    'variable': Object.freeze({
+      'modus-operandi-tritanopia': 'cyan-cooler',
+      'modus-vivendi-tritanopia': 'cyan-cooler'
+    }),
+
     'property': Object.freeze({'': ''}),
     'enumMember': Object.freeze({'': ''}),
     'decorator': Object.freeze({'': ''}),
@@ -1951,7 +1968,11 @@ class ThemeGenerator implements IThemeGenerator {
       'modus-vivendi-tritanopia': 'cyan-warmer'
     }),
 
-    'method': Object.freeze({ '': '' }),
+    'method': Object.freeze({
+      'modus-operandi-tritanopia': 'cyan-warmer',
+      'modus-vivendi-tritanopia': 'cyan-warmer'
+    }),
+
     'macro':  Object.freeze({'': ''}),
     'label':  Object.freeze({'': ''}),
 
@@ -1964,11 +1985,26 @@ class ThemeGenerator implements IThemeGenerator {
       'modus-vivendi-tritanopia': 'red-faint'
     }),
 
-    'string': Object.freeze({'': ''}),
-    'keyword': Object.freeze({'': ''}),
+    'string': Object.freeze({
+      'modus-operandi-tritanopia': 'cyan',
+      'modus-vivendi-tritanopia': 'cyan'
+    }),
+
+    'keyword': Object.freeze({
+      'modus-operandi-tritanopia': 'red-cooler',
+      'modus-vivendi-tritanopia': 'red-cooler'
+    }),
+
     'number': Object.freeze({'': ''}),
-    'regexp': Object.freeze({'': ''}),
-    'operator': Object.freeze({'': ''}),
+
+    'regexp': Object.freeze({
+      'modus-operandi-deuteranopia': 'yellow-cooler',
+      'modus-vivendi-deuteranopia': 'yellow-cooler',
+      'modus-operandi-tritanopia': 'red',
+      'modus-vivendi-tritanopia': 'red'
+    }),
+
+    'operator': Object.freeze({ '': '' }),
   });
 
   /**
