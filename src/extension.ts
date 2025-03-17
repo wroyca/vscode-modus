@@ -18,17 +18,8 @@ enum ThemeType {
  * @interface
  */
 interface IExtensionConfiguration {
-  /** Controls whether keywords use bold styling */
-  readonly boldKeywords: boolean;
-
-  /** Controls whether comments use italic styling */
-  readonly italicComments: boolean;
-
   /** User-defined color overrides */
   readonly colorOverrides: ReadonlyMap<string, string>;
-
-  /** Controls whether semantic highlighting is enabled */
-  readonly useSemanticHighlighting: boolean;
 
   /** Additional debug output verbosity */
   readonly debugMode: boolean;
@@ -104,9 +95,6 @@ interface IVSCodeTheme {
 
   /** Syntax token styling */
   readonly tokenColors: readonly ITokenStyle[];
-
-  /** Whether to use semantic token highlighting */
-  readonly semanticHighlighting: boolean;
 
   /** Semantic token color customizations (optional) */
   readonly semanticTokenColors?: Readonly<Record<string, string | ITokenStyle['settings']>>;
@@ -524,23 +512,16 @@ class ConfigurationService implements IConfigurationService {
   public getConfiguration(): IExtensionConfiguration {
     try {
       const config = vscode.workspace.getConfiguration('modus');
-
-      const boldKeywords = config.get<boolean>('boldKeywords', false);
-      const italicComments = config.get<boolean>('italicComments', true);
-      const useSemanticHighlighting = config.get<boolean>('useSemanticHighlighting', true);
       const debugMode = config.get<boolean>('debugMode', false);
       const overrides = config.get<Record<string, string>>('colorOverrides', {});
-
       const colorOverrides = new Map<string, string>();
+
       for (const [key, value] of Object.entries(overrides)) {
         colorOverrides.set(key, value);
       }
 
       return {
-        boldKeywords,
-        italicComments,
         colorOverrides,
-        useSemanticHighlighting,
         debugMode
       };
     } catch (error) {
@@ -711,6 +692,7 @@ class ThemeParser implements IThemeParser {
       }
 
       // Follow semantic mappings (with cycle detection)
+      //
       const visited = new Set<string>();
       let current = name;
 
@@ -739,7 +721,8 @@ class ThemeParser implements IThemeParser {
  * @const
  * @readonly
  */
-const TEXTMATE_SCOPE_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.freeze({
+const TEXTMATE: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  'comment': Object.freeze(['fg-dim']), // For tokens that represent a comment.
   'string': Object.freeze(['blue-warmer']), // For tokens that represent a string literal.
   'keyword': Object.freeze(['magenta-cooler']), // For tokens that represent a language keyword.
 });
@@ -754,15 +737,15 @@ const TEXTMATE_SCOPE_MAPPINGS: Readonly<Record<string, readonly string[]>> = Obj
  * @const
  * @readonly
  */
-const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.freeze({
+const EDITOR: Readonly<Record<string, readonly string[]>> = Object.freeze({
   // Contrast colors
   //
   // The contrast colors are typically only set for high contrast themes. If
   // set, they add an additional border around items across the UI to increase
   // the contrast.
   //
-  // 'contrastActiveBorder': Object.freeze(['']), // An extra border around active elements to separate them from others for greater contrast.
-  // 'contrastBorder': Object.freeze(['']), // An extra border around elements to separate them from others for greater contrast.
+  'contrastActiveBorder': Object.freeze(['']), // An extra border around active elements to separate them from others for greater contrast.
+  'contrastBorder': Object.freeze(['']), // An extra border around elements to separate them from others for greater contrast.
 
   // Base colors
   //
@@ -906,7 +889,9 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
 
   // Activity Bar
   //
-  // The Activity Bar is usually displayed either on the far left or right of the workbench and allows fast switching between views of the Side Bar.
+  // The Activity Bar is usually displayed either on the far left or right of
+  // the workbench and allows fast switching between views of the Side Bar.
+  //
   'activityBar.background': Object.freeze(['bg-dim']), // Activity Bar background color.
   'activityBar.dropBorder': Object.freeze(['blue']), // Drag and drop feedback color for the activity bar items. The activity bar is showing on the far left or right and allows to switch between views of the side bar.
   'activityBar.foreground': Object.freeze(['fg-main']), // Activity Bar foreground color (for example used for the icons).
@@ -929,6 +914,7 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'activityErrorBadge.background': Object.freeze(['red']), // Background color of the error activity badge
 
   // Profiles
+  //
   'profileBadge.background': Object.freeze(['bg-blue-subtle']), // Profile badge background color. The profile badge shows on top of the settings gear icon in the activity bar.
   'profileBadge.foreground': Object.freeze(['fg-main']), // Profile badge foreground color. The profile badge shows on top of the settings gear icon in the activity bar.
   'profiles.sashBorder': Object.freeze(['border']), // The color of the Profiles editor splitview sash border.
@@ -936,6 +922,7 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   // Side Bar
   //
   // The Side Bar contains views like the Explorer and Search.
+  //
   'sideBar.background': Object.freeze(['bg-dim']), // Side Bar background color.
   'sideBar.foreground': Object.freeze(['fg-main']), // Side Bar foreground color. The Side Bar is the container for views like Explorer and Search.
   'sideBar.border': Object.freeze(['border']), // Side Bar border color on the side separating the editor.
@@ -954,13 +941,14 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   // Minimap
   //
   // The Minimap shows a minified version of the current file.
+  //
   'minimap.findMatchHighlight': Object.freeze(['bg-search-current']), // Highlight color for matches from search within files.
   'minimap.selectionHighlight': Object.freeze(['bg-active']), // Highlight color for the editor selection.
   'minimap.errorHighlight': Object.freeze(['bg-red-subtle']), // Highlight color for errors within the editor.
   'minimap.warningHighlight': Object.freeze(['bg-yellow-subtle']), // Highlight color for warnings within the editor.
   'minimap.background': Object.freeze(['bg-active-argument']), // Minimap background color.
   'minimap.selectionOccurrenceHighlight': Object.freeze(['bg-inactive']), // Minimap marker color for repeating editor selections.
-  // 'minimap.foregroundOpacity': Object.freeze(['0.8']), // Opacity of foreground elements rendered in the minimap. For example, "#000000c0" will render the elements with 75% opacity.
+  'minimap.foregroundOpacity': Object.freeze(['']), // Opacity of foreground elements rendered in the minimap. For example, "#000000c0" will render the elements with 75% opacity.
   'minimap.infoHighlight': Object.freeze(['bg-blue-subtle']), // Minimap marker color for infos.
   'minimap.chatEditHighlight': Object.freeze(['bg-green-subtle']), // Color of pending edit regions in the minimap.
   'minimapSlider.background': Object.freeze(['bg-inactive']), // Minimap slider background color.
@@ -973,7 +961,10 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
 
   // Editor Groups & Tabs
   //
-  // Editor Groups are the containers of editors. There can be many editor groups. A Tab is the container of an editor. Multiple Tabs can be opened in one editor group.
+  // Editor Groups are the containers of editors. There can be many editor
+  // groups. A Tab is the container of an editor. Multiple Tabs can be opened in
+  // one editor group.
+  //
   'editorGroup.border': Object.freeze(['border']), // Color to separate multiple editor groups from each other.
   'editorGroup.dropBackground': Object.freeze(['bg-inactive']), // Background color when dragging editors around.
   'editorGroupHeader.noTabsBackground': Object.freeze(['bg-dim']), // Background color of the editor group title header when using single Tab (set "workbench.editor.showTabs": "single").
@@ -1019,9 +1010,14 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
 
   // Editor colors
   //
-  // The most prominent editor colors are the token colors used for syntax highlighting and are based on the language grammar installed. These colors are defined by the Color Theme but can also be customized with the editor.tokenColorCustomizations setting. See Customizing a Color Theme for details on updating a Color Theme and the available token types.
+  // The most prominent editor colors are the token colors used for syntax
+  // highlighting and are based on the language grammar installed. These colors
+  // are defined by the Color Theme but can also be customized with the
+  // editor.tokenColorCustomizations setting. See Customizing a Color Theme for
+  // details on updating a Color Theme and the available token types.
   //
   // All other editor colors are listed here:
+  //
   'editor.background': Object.freeze(['bg-main']), // Editor background color.
   'editor.foreground': Object.freeze(['fg-main']), // Editor default foreground color.
   'editorLineNumber.foreground': Object.freeze(['fg-dim']), // Color of editor line numbers.
@@ -1036,14 +1032,22 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editor.placeholder.foreground': Object.freeze(['fg-dim']), // Foreground color of the placeholder text in the editor.
   'editor.compositionBorder': Object.freeze(['border']), // The border color for an IME composition.
 
-  // Selection colors are visible when selecting one or more characters. In addition to the selection also all regions with the same content are highlighted.
+  // Selection colors are visible when selecting one or more characters. In
+  // addition to the selection also all regions with the same content are
+  // highlighted.
+  //
   'editor.selectionBackground': Object.freeze(['bg-active']), // Color of the editor selection.
   'editor.selectionForeground': Object.freeze(['fg-main']), // Color of the selected text for high contrast.
   'editor.inactiveSelectionBackground': Object.freeze(['bg-inactive']), // Color of the selection in an inactive editor. The color must not be opaque so as not to hide underlying decorations.
   'editor.selectionHighlightBackground': Object.freeze(['bg-inactive']), // Color for regions with the same content as the selection. The color must not be opaque so as not to hide underlying decorations.
   'editor.selectionHighlightBorder': Object.freeze(['border-mode-line-active']), // Border color for regions with the same content as the selection.
 
-  // Word highlight colors are visible when the cursor is inside a symbol or a word. Depending on the language support available for the file type, all matching references and declarations are highlighted and read and write accesses get different colors. If document symbol language support is not available, this falls back to word highlighting.
+  // Word highlight colors are visible when the cursor is inside a symbol or a
+  // word. Depending on the language support available for the file type, all
+  // matching references and declarations are highlighted and read and write
+  // accesses get different colors. If document symbol language support is not
+  // available, this falls back to word highlighting.
+  //
   'editor.wordHighlightBackground': Object.freeze(['bg-inactive']), // Background color of a symbol during read-access, for example when reading a variable. The color must not be opaque so as not to hide underlying decorations.
   'editor.wordHighlightBorder': Object.freeze(['border-mode-line-active']), // Border color of a symbol during read-access, for example when reading a variable.
   'editor.wordHighlightStrongBackground': Object.freeze(['bg-active']), // Background color of a symbol during write-access, for example when writing to a variable. The color must not be opaque so as not to hide underlying decorations.
@@ -1052,6 +1056,7 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editor.wordHighlightTextBorder': Object.freeze(['border-mode-line-active']), // Border color of a textual occurrence for a symbol.
 
   // Find colors depend on the current find string in the Find/Replace dialog.
+  //
   'findMatchBackground': Object.freeze(['bg-search-current']), // Color of the current search match.
   'findMatchForeground': Object.freeze(['fg-main']), // Text color of the current search match.
   'findMatchHighlightForeground': Object.freeze(['fg-main']), // Foreground color of the other search matches.
@@ -1062,24 +1067,33 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'findRangeHighlightBorder': Object.freeze(['border-mode-line-active']), // Border color the range limiting the search (Enable 'Find in Selection' in the find widget).
 
   // Search colors are used in the search viewlet's global search results.
+  //
   'search.resultsInfoForeground': Object.freeze(['fg-dim']), // Color of the text in the search viewlet's completion message. For example, this color is used in the text that says "{x} results in {y} files".
 
-  // Search Editor colors highlight results in a Search Editor. This can be configured separately from other find matches in order to better differentiate between different classes of match in the same editor.
+  // Search Editor colors highlight results in a Search Editor. This can be
+  // configured separately from other find matches in order to better
+  // differentiate between different classes of match in the same editor.
+  //
   'searchEditor.findMatchBackground': Object.freeze(['bg-search-current']), // Color of the editor's results.
   'searchEditor.findMatchBorder': Object.freeze(['blue']), // Border color of the editor's results.
   'searchEditor.textInputBorder': Object.freeze(['border']), // Search editor text input box border.
 
   // The hover highlight is shown behind the symbol for which a hover is shown.
+  //
   'hoverHighlightBackground': Object.freeze(['bg-hover']), // Highlight below the word for which a hover is shown. The color must not be opaque so as not to hide underlying decorations.
 
-  // The current line is typically shown as either background highlight or a border (not both).
+  // The current line is typically shown as either background highlight or a
+  // border (not both).
+  //
   'lineHighlightBackground': Object.freeze(['bg-hl-line']), // Background color for the highlight of line at the cursor position.
   'lineHighlightBorder': Object.freeze(['border-mode-line-active']), // Background color for the border around the line at the cursor position.
 
-  // The color for the editor watermark
+  // The color for the editor watermark.
+  //
   'editorWatermark.foreground': Object.freeze(['fg-dim']), // Foreground color for the labels in the editor watermark.
 
-  // The color for unicode highlights
+  // The color for unicode highlights.
+  //
   'editorUnicodeHighlight.border': Object.freeze(['yellow']), // Border color used to highlight unicode characters.
   'editorUnicodeHighlight.background': Object.freeze(['bg-yellow-subtle']), // Background color used to highlight unicode characters.
 
@@ -1087,17 +1101,23 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorLink.activeForeground': Object.freeze(['blue-intense']), // Color of active links.
 
   // The range highlight is visible when selecting a search result.
+  //
   'rangeHighlightBackground': Object.freeze(['bg-inactive']), // Background color of highlighted ranges, used by Quick Open, Symbol in File and Find features. The color must not be opaque so as not to hide underlying decorations.
   'rangeHighlightBorder': Object.freeze(['border-mode-line-active']), // Background color of the border around highlighted ranges.
 
-  // The symbol highlight is visible when navigating to a symbol via a command such as Go to Definition.
+  // The symbol highlight is visible when navigating to a symbol via a command
+  // such as Go to Definition.
+  //
   'symbolHighlightBackground': Object.freeze(['bg-active']), // Background color of highlighted symbol. The color must not be opaque so as not to hide underlying decorations.
   'symbolHighlightBorder': Object.freeze(['border']), // Background color of the border around highlighted symbols.
 
   // To see the editor white spaces, enable Toggle Render Whitespace.
+  //
   'editorWhitespace.foreground': Object.freeze(['fg-dim']), // Color of whitespace characters in the editor.
 
-  // To see the editor indent guides, set "editor.guides.indentation": true and "editor.guides.highlightActiveIndentation": true.
+  // To see the editor indent guides, set "editor.guides.indentation": true and
+  // "editor.guides.highlightActiveIndentation": true.
+  //
   'editorIndentGuide.background': Object.freeze(['fg-dim']), // Color of the editor indentation guides.
   'editorIndentGuide.background1': Object.freeze(['fg-dim']), // Color of the editor indentation guides (1).
   'editorIndentGuide.background2': Object.freeze(['fg-dim']), // Color of the editor indentation guides (2).
@@ -1114,6 +1134,7 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorIndentGuide.activeBackground6': Object.freeze(['fg-alt']), // Color of the active editor indentation guides (6).
 
   // To see the editor inline hints, set "editor.inlineSuggest.enabled": true.
+  //
   'editorInlayHint.background': Object.freeze(['bg-dim']), // Background color of inline hints.
   'editorInlayHint.foreground': Object.freeze(['fg-dim']), // Foreground color of inline hints.
   'editorInlayHint.typeForeground': Object.freeze(['blue']), // Foreground color of inline hints for types
@@ -1121,24 +1142,31 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorInlayHint.parameterForeground': Object.freeze(['magenta']), // Foreground color of inline hints for parameters
   'editorInlayHint.parameterBackground': Object.freeze(['bg-magenta-subtle']), // Background color of inline hints for parameters
 
-  // To see editor rulers, define their location with "editor.rulers"
+  // To see editor rulers, define their location with "editor.rulers".
+  //
   'editorRuler.foreground': Object.freeze(['fg-dim']), // Color of the editor rulers.
 
+  //
+  //
   'editor.linkedEditingBackground': Object.freeze(['bg-inactive']), // Background color when the editor is in linked editing mode.
 
   // CodeLens:
+  //
   'editorCodeLens.foreground': Object.freeze(['fg-dim']), // Foreground color of an editor CodeLens.
 
   // Lightbulb:
+  //
   'editorLightBulb.foreground': Object.freeze(['yellow']), // The color of the editor lightbulb icon.
   'editorLightBulbAutoFix.foreground': Object.freeze(['blue']), // The color of the editor lightbulb auto-fix icon.
   'editorLightBulbAi.foreground': Object.freeze(['magenta']), // The color of the editor AI lightbulb icon.
 
   // Bracket matches:
+  //
   'editorBracketMatch.background': Object.freeze(['bg-active']), // Background color behind matching brackets.
   'editorBracketMatch.border': Object.freeze(['border']), // Color for matching brackets boxes.
 
   // Bracket pair colorization:
+  //
   'editorBracketHighlight.foreground1': Object.freeze(['magenta']), // Foreground color of brackets (1). Requires enabling bracket pair colorization.
   'editorBracketHighlight.foreground2': Object.freeze(['blue']), // Foreground color of brackets (2). Requires enabling bracket pair colorization.
   'editorBracketHighlight.foreground3': Object.freeze(['cyan']), // Foreground color of brackets (3). Requires enabling bracket pair colorization.
@@ -1148,6 +1176,7 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorBracketHighlight.unexpectedBracket.foreground': Object.freeze(['red-intense']), // Foreground color of unexpected brackets.
 
   // Bracket pair guides:
+  //
   'editorBracketPairGuide.activeBackground1': Object.freeze(['magenta-faint']), // Background color of active bracket pair guides (1). Requires enabling bracket pair guides.
   'editorBracketPairGuide.activeBackground2': Object.freeze(['blue-faint']), // Background color of active bracket pair guides (2). Requires enabling bracket pair guides.
   'editorBracketPairGuide.activeBackground3': Object.freeze(['cyan-faint']), // Background color of active bracket pair guides (3). Requires enabling bracket pair guides.
@@ -1162,10 +1191,12 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorBracketPairGuide.background6': Object.freeze(['red-faint']), // Background color of inactive bracket pair guides (6). Requires enabling bracket pair guides.
 
   // Folding:
+  //
   'editor.foldBackground': Object.freeze(['bg-inactive']), // Background color for folded ranges. The color must not be opaque so as not to hide underlying decorations.
   'editor.foldPlaceholderForeground': Object.freeze(['fg-dim']), // Color of the collapsed text after the first line of a folded range.
 
   // Overview ruler:
+  //
   'editorOverviewRuler.background': Object.freeze(['bg-active-argument']), // Background color of the editor overview ruler. Only used when the minimap is enabled and placed on the right side of the editor.
   'editorOverviewRuler.border': Object.freeze(['border']), // Color of the overview ruler border.
   'editorOverviewRuler.findMatchForeground': Object.freeze(['blue']), // Overview ruler marker color for find matches. The color must not be opaque so as not to hide underlying decorations.
@@ -1185,6 +1216,7 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorOverviewRuler.inlineChatRemoved': Object.freeze(['bg-red-subtle']), // Overview ruler marker color for inline chat removed content.
 
   // Errors and warnings:
+  //
   'editorError.foreground': Object.freeze(['red']), // Foreground color of error squiggles in the editor.
   'editorError.border': Object.freeze(['red']), // Border color of error boxes in the editor.
   'editorError.background': Object.freeze(['bg-red-subtle']), // Background color of error text in the editor. The color must not be opaque so as not to hide underlying decorations.
@@ -1201,10 +1233,12 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'problemsInfoIcon.foreground': Object.freeze(['blue']), // The color used for the problems info icon.
 
   // Unused source code:
+  //
   'editorUnnecessaryCode.border': Object.freeze(['border']), // Border color of unnecessary (unused) source code in the editor.
-  // 'editorUnnecessaryCode.opacity': Object.freeze(['0.6']), // Opacity of unnecessary (unused) source code in the editor. For example, "#000000c0" will render the code with 75% opacity. For high contrast themes, use the "editorUnnecessaryCode.border" theme color to underline unnecessary code instead of fading it out.
+  'editorUnnecessaryCode.opacity': Object.freeze(['']), // Opacity of unnecessary (unused) source code in the editor. For example, "#000000c0" will render the code with 75% opacity. For high contrast themes, use the "editorUnnecessaryCode.border" theme color to underline unnecessary code instead of fading it out.
 
   // The gutter contains the glyph margins and the line numbers:
+  //
   'editorGutter.background': Object.freeze(['bg-main']), // Background color of the editor gutter. The gutter contains the glyph margins and the line numbers.
   'editorGutter.modifiedBackground': Object.freeze(['yellow']), // Editor gutter background color for lines that are modified.
   'editorGutter.addedBackground': Object.freeze(['green']), // Editor gutter background color for lines that are added.
@@ -1215,13 +1249,16 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorGutter.foldingControlForeground': Object.freeze(['fg-dim']), // Color of the folding control in the editor gutter.
 
   // The editor comments widget can be seen when reviewing pull requests:
+  //
   'editorCommentsWidget.resolvedBorder': Object.freeze(['green']), // Color of borders and arrow for resolved comments.
   'editorCommentsWidget.unresolvedBorder': Object.freeze(['yellow']), // Color of borders and arrow for unresolved comments.
   'editorCommentsWidget.rangeBackground': Object.freeze(['bg-inactive']), // Color of background for comment ranges.
   'editorCommentsWidget.rangeActiveBackground': Object.freeze(['bg-hover']), // Color of background for currently selected or hovered comment range.
   'editorCommentsWidget.replyInputBackground': Object.freeze(['bg-main']), // Background color for comment reply input box.
 
-  // Editor inline edits can be seen when using Copilot to suggest the next change to make:
+  // Editor inline edits can be seen when using Copilot to suggest the next
+  // change to make:
+  //
   'inlineEdit.gutterIndicator.primaryForeground': Object.freeze(['blue']), // Foreground color for the primary inline edit gutter indicator.
   'inlineEdit.gutterIndicator.primaryBackground': Object.freeze(['bg-blue-nuanced']), // Background color for the primary inline edit gutter indicator.
   'inlineEdit.gutterIndicator.secondaryForeground': Object.freeze(['blue']), // Foreground color for the secondary inline edit gutter indicator.
@@ -1243,7 +1280,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'inlineEdit.tabWillAcceptBorder': Object.freeze(['green']), // Border color for the inline edits widget over the original text when tab will accept it.
   'inlineEdit.wordReplacementView.background': Object.freeze(['bg-dim']), // Background color for the inline edit word replacement view.
 
-  // Diff editor colors
+  // Diff editor colors:
+  //
   'diffEditor.insertedTextBackground': Object.freeze(['bg-green-subtle']), // Background color for text that got inserted. The color must not be opaque so as not to hide underlying decorations.
   'diffEditor.insertedTextBorder': Object.freeze(['green']), // Outline color for the text that got inserted.
   'diffEditor.removedTextBackground': Object.freeze(['bg-red-subtle']), // Background color for text that got removed. The color must not be opaque so as not to hide underlying decorations.
@@ -1266,7 +1304,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'multiDiffEditor.background': Object.freeze(['bg-main']), // The background color of the multi file diff editor
   'multiDiffEditor.border': Object.freeze(['border']), // The border color of the multi file diff editor
 
-  // Chat colors
+  // Chat colors:
+  //
   'chat.requestBorder': Object.freeze(['border']), // The border color of a chat request.
   'chat.requestBackground': Object.freeze(['bg-dim']), // The background color of a chat request.
   'chat.slashCommandBackground': Object.freeze(['bg-inactive']), // The background color of a chat slash command.
@@ -1275,7 +1314,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'chat.avatarForeground': Object.freeze(['fg-main']), // The foreground color of a chat avatar.
   'chat.editedFileForeground': Object.freeze(['blue']), // The foreground color of a chat edited file in the edited file list.
 
-  // Inline Chat colors
+  // Inline Chat colors:
+  //
   'inlineChat.background': Object.freeze(['bg-dim']), // Background color of the interactive editor widget.
   'inlineChat.foreground': Object.freeze(['fg-main']), // Foreground color of the interactive editor widget
   'inlineChat.border': Object.freeze(['border']), // Border color of the interactive editor widget.
@@ -1287,11 +1327,13 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'inlineChatDiff.inserted': Object.freeze(['bg-green-subtle']), // Background color of inserted text in the interactive editor input.
   'inlineChatDiff.removed': Object.freeze(['bg-red-subtle']), // Background color of removed text in the interactive editor input.
 
-  // Panel Chat colors
+  // Panel Chat colors:
+  //
   'interactive.activeCodeBorder': Object.freeze(['blue-intense']), // The border color for the current interactive code cell when the editor has focus.
   'interactive.inactiveCodeBorder': Object.freeze(['border']), // The border color for the current interactive code cell when the editor does not have focus.
 
-  // Editor widget colors
+  // Editor widget colors:
+  //
   'editorWidget.foreground': Object.freeze(['fg-main']), // Foreground color of editor widgets, such as find/replace.
   'editorWidget.background': Object.freeze(['bg-dim']), // Background color of editor widgets, such as Find/Replace.
   'editorWidget.border': Object.freeze(['border']), // Border color of the editor widget unless the widget does not contain a border or defines its own border color.
@@ -1318,11 +1360,15 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorStickyScroll.shadow': Object.freeze(['bg-dim']), // Shadow color of sticky scroll in the editor.
   'editorStickyScrollHover.background': Object.freeze(['bg-hover']), // Editor sticky scroll on hover background color.
 
-  // The Debug Exception widget is a peek view that shows in the editor when debug stops at an exception.
+  // The Debug Exception widget is a peek view that shows in the editor when
+  // debug stops at an exception.
+  //
   'debugExceptionWidget.background': Object.freeze(['bg-dim']), // Exception widget background color.
   'debugExceptionWidget.border': Object.freeze(['border']), // Exception widget border color.
 
-  // The editor marker view shows when navigating to errors and warnings in the editor (Go to Next Error or Warning command).
+  // The editor marker view shows when navigating to errors and warnings in the
+  // editor (Go to Next Error or Warning command).
+  //
   'editorMarkerNavigation.background': Object.freeze(['bg-dim']), // Editor marker navigation widget background.
   'editorMarkerNavigationError.background': Object.freeze(['bg-red-subtle']), // Editor marker navigation widget error color.
   'editorMarkerNavigationWarning.background': Object.freeze(['bg-yellow-subtle']), // Editor marker navigation widget warning color.
@@ -1331,7 +1377,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'editorMarkerNavigationWarning.headerBackground': Object.freeze(['yellow-faint']), // Editor marker navigation widget warning heading background.
   'editorMarkerNavigationInfo.headerBackground': Object.freeze(['blue-faint']), // Editor marker navigation widget info heading background.
 
-  // Peek view colors
+  // Peek view colors:
+  //
   'peekView.border': Object.freeze(['border']), // Color of the peek view borders and arrow.
   'peekViewEditor.background': Object.freeze(['bg-active-argument']), // Background color of the peek view editor.
   'peekViewEditorGutter.background': Object.freeze(['bg-dim']), // Background color of the gutter in the peek view editor.
@@ -1348,7 +1395,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'peekViewTitleLabel.foreground': Object.freeze(['fg-main']), // Color of the peek view title.
   'peekViewEditorStickyScroll.background': Object.freeze(['bg-dim']), // Background color of sticky scroll in the peek view editor.
 
-  // Merge conflicts colors
+  // Merge conflicts colors:
+  //
   'merge.currentHeaderBackground': Object.freeze(['bg-blue-nuanced']), // Current header background in inline merge conflicts. The color must not be opaque so as not to hide underlying decorations.
   'merge.currentContentBackground': Object.freeze(['bg-blue-nuanced']), // Current content background in inline merge conflicts. The color must not be opaque so as not to hide underlying decorations.
   'merge.incomingHeaderBackground': Object.freeze(['bg-green-subtle']), // Incoming header background in inline merge conflicts. The color must not be opaque so as not to hide underlying decorations.
@@ -1375,7 +1423,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'mergeEditor.conflict.input1.background': Object.freeze(['bg-blue-nuanced']), // The background color of decorations in input 1.
   'mergeEditor.conflict.input2.background': Object.freeze(['bg-green-nuanced']), // The background color of decorations in input 2.
 
-  // Panel colors
+  // Panel colors:
+  //
   'panel.background': Object.freeze(['bg-dim']), // Panel background color.
   'panel.border': Object.freeze(['border']), // Panel border color to separate the panel from the editor.
   'panel.dropBorder': Object.freeze(['blue']), // Drag and drop feedback color for the panel titles. Panels are shown below the editor area and contain views like output and integrated terminal.
@@ -1397,7 +1446,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'outputView.background': Object.freeze(['bg-main']), // Output view background color.
   'outputViewStickyScroll.background': Object.freeze(['bg-dim']), // Output view sticky scroll background color.
 
-  // Status Bar colors
+  // Status Bar colors:
+  //
   'statusBar.background': Object.freeze(['bg-mode-line-active']), // Standard Status Bar background color.
   'statusBar.foreground': Object.freeze(['fg-main']), // Status Bar foreground color.
   'statusBar.border': Object.freeze(['border']), // Status Bar border color separating the Status Bar and editor.
@@ -1434,14 +1484,18 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'statusBarItem.offlineHoverForeground': Object.freeze(['fg-main']), // Status bar item foreground hover color when the workbench is offline.
   'statusBarItem.offlineHoverBackground': Object.freeze(['red']), // Status bar item background hover color when the workbench is offline.
 
-  // Prominent items stand out from other Status Bar entries to indicate importance. One example is the Toggle Tab Key Moves Focus command change mode indicator.
+  // Prominent items stand out from other Status Bar entries to indicate
+  // importance. One example is the Toggle Tab Key Moves Focus command change
+  // mode indicator.
+  //
   'titleBar.activeBackground': Object.freeze(['bg-dim']), // Title Bar background when the window is active.
   'titleBar.activeForeground': Object.freeze(['fg-main']), // Title Bar foreground when the window is active.
   'titleBar.inactiveBackground': Object.freeze(['bg-inactive']), // Title Bar background when the window is inactive.
   'titleBar.inactiveForeground': Object.freeze(['fg-dim']), // Title Bar foreground when the window is inactive.
   'titleBar.border': Object.freeze(['border']), // Title bar border color.
 
-  // Menu Bar colors
+  // Menu Bar colors:
+  //
   'menubar.selectionForeground': Object.freeze(['fg-main']), // Foreground color of the selected menu item in the menubar.
   'menubar.selectionBackground': Object.freeze(['bg-active']), // Background color of the selected menu item in the menubar.
   'menubar.selectionBorder': Object.freeze(['border']), // Border color of the selected menu item in the menubar.
@@ -1453,7 +1507,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'menu.separatorBackground': Object.freeze(['border']), // Color of a separator menu item in menus.
   'menu.border': Object.freeze(['border']), // Border color of menus.
 
-  // Command Center colors
+  // Command Center colors:
+  //
   'commandCenter.foreground': Object.freeze(['fg-main']), // Foreground color of the Command Center.
   'commandCenter.activeForeground': Object.freeze(['fg-main']), // Active foreground color of the Command Center.
   'commandCenter.background': Object.freeze(['bg-dim']), // Background color of the Command Center.
@@ -1464,7 +1519,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'commandCenter.activeBorder': Object.freeze(['border']), // Active border color of the Command Center.
   'commandCenter.debuggingBackground': Object.freeze(['bg-magenta-subtle']), // Command Center background color when a program is being debugged.
 
-  // Notification colors
+  // Notification colors:
+  //
   'notificationCenter.border': Object.freeze(['border']), // Notification Center border color.
   'notificationCenterHeader.foreground': Object.freeze(['fg-main']), // Notification Center header foreground color.
   'notificationCenterHeader.background': Object.freeze(['bg-active-argument']), // Notification Center header background color.
@@ -1477,12 +1533,14 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'notificationsWarningIcon.foreground': Object.freeze(['yellow']), // The color used for the notification warning icon.
   'notificationsInfoIcon.foreground': Object.freeze(['blue']), // The color used for the notification info icon.
 
-  // Banner colors
+  // Banner colors:
+  //
   'banner.background': Object.freeze(['bg-active-argument']), // Banner background color.
   'banner.foreground': Object.freeze(['fg-main']), // Banner foreground color.
   'banner.iconForeground': Object.freeze(['blue']), // Color for the icon in front of the banner text.
 
-  // Extensions colors
+  // Extensions colors:
+  //
   'extensionButton.prominentForeground': Object.freeze(['fg-main']), // Extension view button foreground color (for example Install button).
   'extensionButton.prominentBackground': Object.freeze(['blue']), // Extension view button background color.
   'extensionButton.prominentHoverBackground': Object.freeze(['blue-intense']), // Extension view button background hover color.
@@ -1497,7 +1555,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'extensionIcon.preReleaseForeground': Object.freeze(['magenta']), // The icon color for pre-release extension.
   'extensionIcon.sponsorForeground': Object.freeze(['red']), // The icon color for extension sponsor.
 
-  // Quick picker colors
+  // Quick picker colors:
+  //
   'pickerGroup.border': Object.freeze(['border']), // Quick picker (Quick Open) color for grouping borders.
   'pickerGroup.foreground': Object.freeze(['fg-alt']), // Quick picker (Quick Open) color for grouping labels.
   'quickInput.background': Object.freeze(['bg-dim']), // Quick input background color. The quick input widget is the container for views like the color theme picker.
@@ -1507,17 +1566,20 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'quickInputList.focusIconForeground': Object.freeze(['fg-main']), // Quick picker icon foreground color for the focused item.
   'quickInputTitle.background': Object.freeze(['bg-active-argument']), // Quick picker title background color. The quick picker widget is the container for pickers like the Command Palette.
 
-  // Keybinding label colors
+  // Keybinding label colors:
+  //
   'keybindingLabel.background': Object.freeze(['bg-active-argument']), // Keybinding label background color. The keybinding label is used to represent a keyboard shortcut.
   'keybindingLabel.foreground': Object.freeze(['fg-main']), // Keybinding label foreground color. The keybinding label is used to represent a keyboard shortcut.
   'keybindingLabel.border': Object.freeze(['border']), // Keybinding label border color. The keybinding label is used to represent a keyboard shortcut.
   'keybindingLabel.bottomBorder': Object.freeze(['border-mode-line-active']), // Keybinding label border bottom color. The keybinding label is used to represent a keyboard shortcut.
 
-  // Keyboard shortcut table colors
+  // Keyboard shortcut table colors:
+  //
   'keybindingTable.headerBackground': Object.freeze(['bg-active-argument']), // Background color for the keyboard shortcuts table header.
   'keybindingTable.rowsBackground': Object.freeze(['bg-dim']), // Background color for the keyboard shortcuts table rows.
 
-  // Integrated Terminal colors
+  // Integrated Terminal colors:
+  //
   'terminal.background': Object.freeze(['bg-dim']), // The background of the Integrated Terminal's viewport.
   'terminal.border': Object.freeze(['border']), // The color of the border that separates split panes within the terminal. This defaults to panel.border.
   'terminal.foreground': Object.freeze(['fg-main']), // The default foreground color of the Integrated Terminal.
@@ -1563,7 +1625,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'terminalSymbolIcon.aliasForeground': Object.freeze(['blue']), // The foreground color for an alias icon. These icons will appear in the terminal suggest widget
   'terminalSymbolIcon.flagForeground': Object.freeze(['yellow']), // The foreground color for a flag icon. These icons will appear in the terminal suggest widget
 
-  // Debug colors
+  // Debug colors:
+  //
   'debugToolBar.background': Object.freeze(['bg-dim']), // Debug toolbar background color.
   'debugToolBar.border': Object.freeze(['border']), // Debug toolbar border color.
   'editor.stackFrameHighlightBackground': Object.freeze(['bg-yellow-subtle']), // Background color of the top stack frame highlight in the editor.
@@ -1583,7 +1646,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'debugTokenExpression.error': Object.freeze(['red']), // Foreground color for expression errors in debug views.
   'debugTokenExpression.type': Object.freeze(['yellow']), // Foreground color for the token types shown in the debug views (ie. the Variables or Watch view).
 
-  // Testing colors
+  // Testing colors:
+  //
   'testing.runAction': Object.freeze(['green']), // Color for 'run' icons in the editor.
   'testing.iconErrored': Object.freeze(['red']), // Color for the 'Errored' icon in the test explorer.
   'testing.iconFailed': Object.freeze(['red']), // Color for the 'failed' icon in the test explorer.
@@ -1617,7 +1681,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'testing.message.error.badgeBorder': Object.freeze(['red']), // Border color of test error messages shown inline in the editor.
   'testing.message.error.badgeForeground': Object.freeze(['fg-main']), // Text color of test error messages shown inline in the editor.
 
-  // Welcome page colors
+  // Welcome page colors:
+  //
   'welcomePage.background': Object.freeze(['bg-main']), // Background color for the Welcome page.
   'welcomePage.progress.background': Object.freeze(['bg-dim']), // Foreground color for the Welcome page progress bars.
   'welcomePage.progress.foreground': Object.freeze(['blue']), // Background color for the Welcome page progress bars.
@@ -1627,7 +1692,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'walkThrough.embeddedEditorBackground': Object.freeze(['bg-dim']), // Background color for the embedded editors on the Interactive Playground.
   'walkthrough.stepTitle.foreground': Object.freeze(['fg-main']), // Foreground color of the heading of each walkthrough step.
 
-  // Git colors
+  // Git colors:
+  //
   'gitDecoration.addedResourceForeground': Object.freeze(['green']), // Color for added Git resources. Used for file labels and the SCM viewlet.
   'gitDecoration.modifiedResourceForeground': Object.freeze(['blue']), // Color for modified Git resources. Used for file labels and the SCM viewlet.
   'gitDecoration.deletedResourceForeground': Object.freeze(['red']), // Color for deleted Git resources. Used for file labels and the SCM viewlet.
@@ -1640,7 +1706,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'gitDecoration.submoduleResourceForeground': Object.freeze(['magenta']), // Color for submodule resources.
   'git.blame.editorDecorationForeground': Object.freeze(['fg-dim']), // Color for the blame editor decoration.
 
-  // Source Control Graph colors
+  // Source Control Graph colors:
+  //
   'scmGraph.historyItemHoverLabelForeground': Object.freeze(['fg-main']), // History item hover label foreground color.
   'scmGraph.foreground1': Object.freeze(['blue']), // Source control graph foreground color (1).
   'scmGraph.foreground2': Object.freeze(['green']), // Source control graph foreground color (2).
@@ -1655,7 +1722,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'scmGraph.historyItemHoverDefaultLabelForeground': Object.freeze(['fg-main']), // History item hover default label foreground color.
   'scmGraph.historyItemHoverDefaultLabelBackground': Object.freeze(['bg-dim']), // History item hover default label background color.
 
-  // Settings Editor colors
+  // Settings Editor colors:
+  //
   'settings.headerForeground': Object.freeze(['fg-main']), // The foreground color for a section header or active title.
   'settings.modifiedItemIndicator': Object.freeze(['blue']), // The line that indicates a modified setting.
   'settings.dropdownBackground': Object.freeze(['bg-dim']), // Dropdown background.
@@ -1678,20 +1746,23 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'settings.sashBorder': Object.freeze(['border']), // The color of the Settings editor splitview sash border.
   'settings.settingsHeaderHoverForeground': Object.freeze(['fg-main']), // The foreground color for a section header or hovered title.
 
-  // Breadcrumbs colors
+  // Breadcrumbs colors:
+  //
   'breadcrumb.foreground': Object.freeze(['fg-dim']), // Color of breadcrumb items.
   'breadcrumb.background': Object.freeze(['bg-dim']), // Background color of breadcrumb items.
   'breadcrumb.focusForeground': Object.freeze(['fg-main']), // Color of focused breadcrumb items.
   'breadcrumb.activeSelectionForeground': Object.freeze(['fg-main']), // Color of selected breadcrumb items.
   'breadcrumbPicker.background': Object.freeze(['bg-dim']), // Background color of breadcrumb item picker.
 
-  // Snippets colors
+  // Snippets colors:
+  //
   'editor.snippetTabstopHighlightBackground': Object.freeze(['bg-blue-nuanced']), // Highlight background color of a snippet tabstop.
   'editor.snippetTabstopHighlightBorder': Object.freeze(['blue']), // Highlight border color of a snippet tabstop.
   'editor.snippetFinalTabstopHighlightBackground': Object.freeze(['bg-green-nuanced']), // Highlight background color of the final tabstop of a snippet.
   'editor.snippetFinalTabstopHighlightBorder': Object.freeze(['green']), // Highlight border color of the final tabstop of a snippet.
 
-  // Symbol Icons colors
+  // Symbol Icons colors:
+  //
   'symbolIcon.arrayForeground': Object.freeze(['magenta']), // The foreground color for array symbols.
   'symbolIcon.booleanForeground': Object.freeze(['blue']), // The foreground color for boolean symbols.
   'symbolIcon.classForeground': Object.freeze(['yellow']), // The foreground color for class symbols.
@@ -1726,7 +1797,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'symbolIcon.unitForeground': Object.freeze(['magenta']), // The foreground color for unit symbols.
   'symbolIcon.variableForeground': Object.freeze(['blue']), // The foreground color for variable symbols.
 
-  // Debug Icons colors
+  // Debug Icons colors:
+  //
   'debugIcon.breakpointForeground': Object.freeze(['red']), // Icon color for breakpoints.
   'debugIcon.breakpointDisabledForeground': Object.freeze(['red-faint']), // Icon color for disabled breakpoints.
   'debugIcon.breakpointUnverifiedForeground': Object.freeze(['yellow']), // Icon color for unverified breakpoints.
@@ -1748,7 +1820,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'debugConsole.sourceForeground': Object.freeze(['cyan']), // Foreground color for source filenames in debug REPL console.
   'debugConsoleInputIcon.foreground': Object.freeze(['fg-alt']), // Foreground color for debug console input marker icon.
 
-  // Notebook colors
+  // Notebook colors:
+  //
   'notebook.editorBackground': Object.freeze(['bg-main']), // Notebook background color.
   'notebook.cellBorderColor': Object.freeze(['border']), // The border color for notebook cells.
   'notebook.cellHoverBackground': Object.freeze(['bg-hover']), // The background color of a cell when the cell is hovered.
@@ -1774,7 +1847,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'notebookStatusSuccessIcon.foreground': Object.freeze(['green']), // The success icon color of notebook cells in the cell status bar.
   'notebookEditorOverviewRuler.runningCellForeground': Object.freeze(['blue']), // The color of the running cell decoration in the notebook editor overview ruler.
 
-  // Chart colors
+  // Chart colors:
+  //
   'charts.foreground': Object.freeze(['fg-main']), // Contrast color for text in charts.
   'charts.lines': Object.freeze(['border']), // Color for lines in charts.
   'charts.red': Object.freeze(['red']), // Color for red elements in charts.
@@ -1787,20 +1861,25 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'chart.axis': Object.freeze(['fg-dim']), // Axis color for the chart.
   'chart.guide': Object.freeze(['border']), // Guide line for the chart.
 
-  // Ports colors
+  // Ports colors:
+  //
   'ports.iconRunningProcessForeground': Object.freeze(['blue']), // The color of the icon for a port that has an associated running process.
 
-  // Comments View colors
+  // Comments View colors:
+  //
   'commentsView.resolvedIcon': Object.freeze(['green']), // Icon color for resolved comments.
   'commentsView.unresolvedIcon': Object.freeze(['yellow']), // Icon color for unresolved comments.
 
-  // Action Bar colors
+  // Action Bar colors:
+  //
   'actionBar.toggledBackground': Object.freeze(['bg-active']), // Background color for toggled action items in action bar.
 
-  // Simple Find Widget colors
+  // Simple Find Widget colors:
+  //
   'simpleFindWidget.sashBorder': Object.freeze(['border']), // Border color of the sash border.
 
-  // Gauge colors
+  // Gauge colors:
+  //
   'gauge.background': Object.freeze(['bg-dim']), // Gauge background color.
   'gauge.foreground': Object.freeze(['blue']), // Gauge foreground color.
   'gauge.border': Object.freeze(['border']), // Gauge border color.
@@ -1809,7 +1888,8 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
   'gauge.errorBackground': Object.freeze(['bg-red-subtle']), // Gauge error background color.
   'gauge.errorForeground': Object.freeze(['red']), // Gauge error foreground color.
 
-  // Extension colors
+  // Extension colors:
+  //
   'extensionColors': Object.freeze(['fg-dim']), // Color IDs can also be contributed by extensions through the color contribution point. These colors also appear when using code complete in the workbench.colorCustomizations settings and the color theme definition file. Users can see what colors an extension defines in the extension contributions tab.
 });
 
@@ -1821,7 +1901,7 @@ const VS_CODE_UI_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.
  * @const
  * @readonly
  */
-const SEMANTIC_TOKEN_MAPPINGS: Readonly<Record<string, readonly string[]>> = Object.freeze({
+const SEMANTIC: Readonly<Record<string, readonly string[]>> = Object.freeze({
   'namespace':      Object.freeze(['']), // For identifiers that declare or reference a namespace, module, or package.
   'class':          Object.freeze(['']), // For identifiers that declare or reference a class type.
   'enum':           Object.freeze(['']), // For identifiers that declare or reference an enumeration type.
@@ -1929,32 +2009,32 @@ class ThemeGenerator implements IThemeGenerator {
    * @private
    * @readonly
    */
-  private readonly THEME_SPECIFIC_OVERRIDES: Readonly<Record<string, Readonly<Record<string, string>>>> = Object.freeze({
+  private readonly overrides: Readonly<Record<string, Readonly<Record<string, string>>>> = Object.freeze({
     // Semantic tokens
     //
     'namespace': Object.freeze({ '': '' }),
-    'class': Object.freeze({'': ''}),
-    'enum': Object.freeze({'': ''}),
-    'interface': Object.freeze({'': ''}),
-    'struct': Object.freeze({'': ''}),
-    'typeParameter': Object.freeze({'': ''}),
+    'class': Object.freeze({ '': '' }),
+    'enum': Object.freeze({ '': '' }),
+    'interface': Object.freeze({ '': '' }),
+    'struct': Object.freeze({ '': '' }),
+    'typeParameter': Object.freeze({ '': '' }),
 
     'type': Object.freeze({
       'modus-operandi-tritanopia': 'blue-warmer',
       'modus-vivendi-tritanopia': 'blue-warmer'
     }),
 
-    'parameter': Object.freeze({'': ''}),
+    'parameter': Object.freeze({ '': '' }),
 
     'variable': Object.freeze({
       'modus-operandi-tritanopia': 'cyan-cooler',
       'modus-vivendi-tritanopia': 'cyan-cooler'
     }),
 
-    'property': Object.freeze({'': ''}),
-    'enumMember': Object.freeze({'': ''}),
-    'decorator': Object.freeze({'': ''}),
-    'event': Object.freeze({'': ''}),
+    'property': Object.freeze({ '': '' }),
+    'enumMember': Object.freeze({ '': '' }),
+    'decorator': Object.freeze({ '': '' }),
+    'event': Object.freeze({ '': '' }),
 
     'function': Object.freeze({
       'modus-operandi-tritanopia': 'cyan-warmer',
@@ -1966,8 +2046,8 @@ class ThemeGenerator implements IThemeGenerator {
       'modus-vivendi-tritanopia': 'cyan-warmer'
     }),
 
-    'macro':  Object.freeze({'': ''}),
-    'label':  Object.freeze({'': ''}),
+    'macro': Object.freeze({ '': '' }),
+    'label': Object.freeze({ '': '' }),
 
     'comment': Object.freeze({
       'modus-operandi-tinted': 'red-faint',
@@ -1988,7 +2068,7 @@ class ThemeGenerator implements IThemeGenerator {
       'modus-vivendi-tritanopia': 'red-cooler'
     }),
 
-    'number': Object.freeze({'': ''}),
+    'number': Object.freeze({ '': '' }),
 
     'regexp': Object.freeze({
       'modus-operandi-deuteranopia': 'yellow-cooler',
@@ -2034,7 +2114,6 @@ class ThemeGenerator implements IThemeGenerator {
       Validator.required(config, 'Configuration');
 
       const { id, name, type } = definition;
-      const { boldKeywords, italicComments, useSemanticHighlighting } = config;
 
       const getColor = (colorName: string): string => {
         const resolvedColor = this.parser.resolveColor(colorName, palette);
@@ -2045,22 +2124,16 @@ class ThemeGenerator implements IThemeGenerator {
       };
 
       const colors: Record<string, string> = {};
-      for (const [vscodeId, modusColors] of Object.entries(VS_CODE_UI_MAPPINGS)) {
+      for (const [vscodeId, modusColors] of Object.entries(EDITOR)) {
         if (modusColors.length > 0 && modusColors[0] !== '') {
           colors[vscodeId] = getColor(modusColors[0]);
         }
       }
 
       const tokenColors: ITokenStyle[] = [];
-      this.processCommentTokens(tokenColors, palette, id, type, italicComments, getColor);
-      this.processTextMateTokens(tokenColors, palette, id, boldKeywords, getColor);
-
-      // Process semantic tokens, but only if semantic highlighting is enabled.
-      //
+      this.processTextMateTokens(tokenColors, palette, id, getColor);
       const semanticTokenColors: Record<string, string | ITokenStyle['settings']> = {};
-      if (useSemanticHighlighting) {
-        this.processSemanticTokens(semanticTokenColors, palette, id, boldKeywords, italicComments, getColor);
-      }
+      this.processSemanticTokens(semanticTokenColors, palette, id, getColor);
 
       this.logger.info(`Generated theme: ${name}`);
 
@@ -2069,8 +2142,7 @@ class ThemeGenerator implements IThemeGenerator {
         type,
         colors: Object.freeze(colors),
         tokenColors: Object.freeze(tokenColors),
-        semanticHighlighting: useSemanticHighlighting,
-        ...(useSemanticHighlighting ? { semanticTokenColors: Object.freeze(semanticTokenColors) } : {})
+        semanticTokenColors: Object.freeze(semanticTokenColors)
       });
     } catch (error) {
       if (error instanceof ModusThemeError) {
@@ -2084,77 +2156,27 @@ class ThemeGenerator implements IThemeGenerator {
   }
 
   /**
-   * Process comment tokens with theme-specific overrides
-   *
-   * Comments are handled separately from other tokens because they are a
-   * special case: while they are technically semantic tokens, they are not
-   * processed by the semantic token processor but instead handled by the
-   * TextMate token processor if available.
-   *
-   * @private
-   * @param tokenColors - Token colors array to append to
-   * @param palette - Color palette
-   * @param themeId - Theme identifier
-   * @param themeType - Theme type (light/dark)
-   * @param italicComments - Whether to use italic styling for comments
-   * @param getColor - Function to resolve colors
-   */
-  private processCommentTokens(
-    tokenColors: ITokenStyle[],
-    palette: IColorPalette,
-    themeId: string,
-    themeType: ThemeType,
-    italicComments: boolean,
-    getColor: (name: string) => string
-  ): void {
-    const commentOverrides = this.THEME_SPECIFIC_OVERRIDES['comment'] || {};
-    const colorName = commentOverrides[themeId] || commentOverrides['default'] || 'fg-dim';
-    const commentColor = getColor(colorName);
-
-    if (commentOverrides[themeId]) {
-      this.logger.debug(`Applied theme-specific comment color for ${themeId}: ${colorName} (${commentColor})`);
-    }
-
-    tokenColors.push({
-      scope: ['comment', 'punctuation.definition.comment'],
-      settings: {
-        foreground: commentColor,
-        fontStyle: italicComments ? 'italic' : undefined
-      }
-    });
-  }
-
-  /**
    * Process TextMate tokens with theme-specific overrides
    * @private
    * @param tokenColors - Token colors array to append to
    * @param palette - Color palette
    * @param themeId - Theme identifier
-   * @param boldKeywords - Whether keywords should be bold
    * @param getColor - Function to resolve colors
    */
   private processTextMateTokens(
     tokenColors: ITokenStyle[],
     palette: IColorPalette,
     themeId: string,
-    boldKeywords: boolean,
     getColor: (name: string) => string
   ): void {
     const scopesByColor = new Map<string, string[]>();
 
-    for (const [scope, colorNames] of Object.entries(TEXTMATE_SCOPE_MAPPINGS)) {
-      // Skip comments (already handled)
-      if (scope === 'comment' || scope === 'punctuation.definition.comment') {
-        continue;
-      }
-
-      const overrides = this.THEME_SPECIFIC_OVERRIDES[scope];
+    for (const [scope, colorNames] of Object.entries(TEXTMATE)) {
+      const overrides = this.overrides[scope];
       let colorName: string;
 
       if (overrides && overrides[themeId]) {
         colorName = overrides[themeId];
-      } else if (overrides && overrides['default']) {
-        colorName = overrides['default'];
       } else if (colorNames.length > 0 && colorNames[0] !== '') {
         colorName = colorNames[0];
       } else {
@@ -2168,15 +2190,10 @@ class ThemeGenerator implements IThemeGenerator {
     }
 
     for (const [colorName, scopes] of scopesByColor.entries()) {
-      const foreground = getColor(colorName);
-      const fontStyle = boldKeywords &&
-        (colorName === 'magenta-cooler' || colorName === 'magenta-warmer') ? 'bold' : undefined;
-
       tokenColors.push({
         scope: scopes,
         settings: {
-          foreground,
-          fontStyle
+          foreground: getColor(colorName)
         }
       });
     }
@@ -2188,61 +2205,27 @@ class ThemeGenerator implements IThemeGenerator {
    * @param semanticTokenColors - Semantic token colors record to populate
    * @param palette - Color palette
    * @param themeId - Theme identifier
-   * @param boldKeywords - Whether keywords should be bold
-   * @param italicComments - Whether comments should be italic
    * @param getColor - Function to resolve colors
    */
   private processSemanticTokens(
     semanticTokenColors: Record<string, string | ITokenStyle['settings']>,
     palette: IColorPalette,
     themeId: string,
-    boldKeywords: boolean,
-    italicComments: boolean,
     getColor: (name: string) => string
   ): void {
-    for (const [token, colorNames] of Object.entries(SEMANTIC_TOKEN_MAPPINGS)) {
-      if (token === 'comment') {
-        continue; // Handle comments separately
-      }
-
-      const overrides = this.THEME_SPECIFIC_OVERRIDES[token];
+    for (const [token, colorNames] of Object.entries(SEMANTIC)) {
+      const overrides = this.overrides[token];
       let colorName: string;
 
       if (overrides && overrides[themeId]) {
         colorName = overrides[themeId];
-      } else if (overrides && overrides['default']) {
-        colorName = overrides['default'];
       } else if (colorNames.length > 0 && colorNames[0] !== '') {
         colorName = colorNames[0];
       } else {
         continue;
       }
 
-      const foreground = getColor(colorName);
-      const fontStyle = boldKeywords &&
-        (colorName === 'magenta-cooler' || colorName === 'magenta-warmer') ? 'bold' : undefined;
-
-      if (fontStyle) {
-        semanticTokenColors[token] = {
-          foreground,
-          fontStyle
-        };
-      } else {
-        semanticTokenColors[token] = foreground;
-      }
-    }
-
-    const commentOverrides = this.THEME_SPECIFIC_OVERRIDES['comment'] || {};
-    const colorName = commentOverrides[themeId] || commentOverrides['default'] || 'fg-dim';
-    const commentColor = getColor(colorName);
-
-    if (italicComments) {
-      semanticTokenColors['comment'] = {
-        foreground: commentColor,
-        fontStyle: 'italic'
-      };
-    } else {
-      semanticTokenColors['comment'] = commentColor;
+      semanticTokenColors[token] = getColor(colorName);
     }
   }
 }
