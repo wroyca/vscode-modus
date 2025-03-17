@@ -610,35 +610,28 @@ class ThemeParser implements IThemeParser {
       const colors = new Map<string, string>();
       const semantics = new Map<string, string>();
 
-      // Extract direct color definitions (color-name "#RRGGBB")
-      const colorRegex = /\(([a-zA-Z0-9-]+)\s+"(#[0-9a-fA-F]{6})"\)/g;
-      let colorMatch: RegExpExecArray | null;
-
-      while ((colorMatch = colorRegex.exec(content)) !== null) {
-        const name = colorMatch[1];
-        const value = colorMatch[2];
-
-        try {
-          Validator.notEmpty(name, 'Color name');
-          Validator.hexColor(value, 'Color value');
-          colors.set(name, value);
-        } catch (error) {
-          this.logger.warn(`Skipping invalid color: ${name}=${value}. ${error instanceof Error ? error.message : ''}`);
+      // Helper lambda for extracting regex matches
+      //
+      const parse = (r: RegExp, matcher: (m: RegExpExecArray) => void): void => {
+        let m: RegExpExecArray | null;
+        while ((m = r.exec(content)) !== null) {
+          matcher(m);
         }
-      }
+      };
 
-      // Extract semantic mappings (semantic-name color-name)
-      const semanticRegex = /\(([a-zA-Z0-9-]+)\s+([a-zA-Z0-9-]+)\)/g;
-      let semanticMatch: RegExpExecArray | null;
+      // (color-name "#RRGGBB")
+      //
+      parse(
+        /\(([a-zA-Z0-9-]+)\s+"(#[0-9a-fA-F]{6})"\)/g,
+        (m) => colors.set(m[1], m[2])
+      );
 
-      while ((semanticMatch = semanticRegex.exec(content)) !== null) {
-        const name = semanticMatch[1];
-        const target = semanticMatch[2];
-
-        if (!target.startsWith('#')) {
-          semantics.set(name, target);
-        }
-      }
+      // (semantic-name color-name)
+      //
+      parse(
+        /\(([a-zA-Z0-9-]+)\s+(?!#)([a-zA-Z0-9-]+)\)/g,
+        (m) => semantics.set(m[1], m[2])
+      );
 
       if (colors.size === 0) {
         throw new ThemeParseError(`No colors found in theme file: ${filePath}`);
