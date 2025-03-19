@@ -69,25 +69,15 @@
     "configuration": {
       "title": "Modus Themes",
       "properties": {
-        "modus.boldKeywords": {
-          "type": "boolean",
-          "default": false,
-          "description": "Controls whether keywords use bold styling"
-        },
-        "modus.italicComments": {
-          "type": "boolean",
-          "default": true,
-          "description": "Controls whether comments use italic styling"
-        },
-        "modus.useSemanticHighlighting": {
-          "type": "boolean",
-          "default": true,
-          "description": "Controls whether semantic highlighting is enabled"
-        },
         "modus.debugMode": {
           "type": "boolean",
           "default": true,
           "description": "Enable additional debug output in the Output panel"
+        },
+        "modus.experimentalUiColors": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable experimental UI color mappings for development and testing"
         },
         "modus.colorOverrides": {
           "type": "object",

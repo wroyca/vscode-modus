@@ -23,6 +23,9 @@ interface IExtensionConfiguration {
 
   /** Additional debug output verbosity */
   readonly debugMode: boolean;
+
+  /** Enable experimental UI color mappings */
+  readonly experimentalUiColors: boolean;
 }
 
 /**
@@ -513,6 +516,7 @@ class ConfigurationService implements IConfigurationService {
     try {
       const config = vscode.workspace.getConfiguration('modus');
       const debugMode = config.get<boolean>('debugMode', false);
+      const experimentalUiColors = config.get<boolean>('experimentalUiColors', false);
       const overrides = config.get<Record<string, string>>('colorOverrides', {});
       const colorOverrides = new Map<string, string>();
 
@@ -522,7 +526,8 @@ class ConfigurationService implements IConfigurationService {
 
       return {
         colorOverrides,
-        debugMode
+        debugMode,
+        experimentalUiColors
       };
     } catch (error) {
       throw new ConfigurationError('Failed to load configuration', error instanceof Error ? error : undefined);
@@ -900,6 +905,176 @@ const EDITOR: Readonly<Record<string, readonly string[]>> = Object.freeze({
 });
 
 /**
+ * Experimental UI mappings.
+ *
+ * This is highly experimental, and everything is subject to change. Expect
+ * potential issues such as incorrect contrast, color mismatches, and other
+ * visual inconsistencies. Use it only if you're willing to contribute or can
+ * tolerate any problems that may arise.
+ *
+ * @const
+ * @readonly
+ */
+const EDITOR_DEVEL: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  // Text colors
+  //
+
+  // Action colors
+  //
+
+  // Button control
+  //
+
+  // Dropdown control
+  //
+
+  // Input control
+  //
+
+  // Scrollbar control
+  //
+
+  // Badge
+  //
+
+  // Progress bar
+  //
+
+  // Lists and trees
+  //
+
+  // Activity Bar
+  //
+
+  // Profiles
+  //
+
+  // Side Bar
+  //
+
+  // Minimap
+  //
+
+  // Editor Groups & Tabs
+  //
+
+  // Editor colors
+  //
+
+  // Diff editor colors
+  //
+
+  // Chat colors
+  //
+
+  // Inline Chat colors
+  //
+
+  // Panel Chat colors
+  //
+
+  // Editor widget colors
+  //
+
+  // Peek view colors
+  //
+
+  // Merge conflicts colors
+  //
+
+  // Panel colors
+  //
+
+  // Status Bar colors
+  //
+
+  // Title Bar colors
+  //
+  'titleBar.activeBackground': Object.freeze(['bg-main']),
+
+  // Menu Bar colors
+  //
+
+  // Command Center colors
+  //
+
+  // Notification colors
+  //
+
+  // Banner colors
+  //
+
+  // Extensions colors
+  //
+
+  // Quick picker colors
+  //
+
+  // Keybinding label colors
+  //
+
+  // Keyboard shortcut table colors
+  //
+
+  // Integrated Terminal colors
+  //
+
+  // Debug colors
+  //
+
+  // Testing colors
+  //
+
+  // Welcome page colors
+  //
+
+  // Git colors
+  //
+
+  // Source Control Graph colors
+  //
+
+  // Settings Editor colors
+  //
+
+  // Breadcrumbs colors
+  //
+
+  // Snippets colors
+  //
+
+  // Symbol Icons colors
+  //
+
+  // Debug Icons colors
+  //
+
+  // Notebook colors
+  //
+
+  // Chart colors
+  //
+
+  // Ports colors
+  //
+
+  // Comments View colors
+  //
+
+  // Action Bar colors
+  //
+
+  // Simple Find Widget colors
+  //
+
+  // Gauge colors
+  //
+
+  // Extension colors
+  //
+});
+
+/**
  * Semantic token mappings
  *
  * Tokens auto-generated from
@@ -1060,7 +1235,9 @@ class ThemeGenerator implements IThemeGenerator {
       };
 
       const colors: Record<string, string> = {};
-      for (const [vscodeId, modusColors] of Object.entries(EDITOR)) {
+      const uiColorMappings = config.experimentalUiColors ? EDITOR_DEVEL : EDITOR;
+
+      for (const [vscodeId, modusColors] of Object.entries(uiColorMappings)) {
         if (modusColors.length > 0 && modusColors[0] !== '') {
           colors[vscodeId] = getColor(modusColors[0]);
         }
@@ -1071,7 +1248,7 @@ class ThemeGenerator implements IThemeGenerator {
       const semanticTokenColors: Record<string, string | ITokenStyle['settings']> = {};
       this.processSemanticTokens(semanticTokenColors, palette, id, getColor);
 
-      this.logger.info(`Generated theme: ${name}`);
+      this.logger.info(`Generated theme: ${name}${config.experimentalUiColors ? ' (with experimental UI colors)' : ''}`);
 
       return Object.freeze({
         name,
