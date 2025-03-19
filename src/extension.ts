@@ -141,9 +141,10 @@ interface IThemeParser {
    * Resolve a color name to its actual hex value
    * @param name - Color name to resolve
    * @param palette - Palette to resolve against
+   * @param themeId - Optional theme identifier
    * @returns Resolved hex color or undefined if not found
    */
-  resolveColor(name: string, palette: IColorPalette): string | undefined;
+  resolveColor(name: string, palette: IColorPalette, themeId?: string): string | undefined;
 }
 
 /**
@@ -687,10 +688,17 @@ class ThemeParser implements IThemeParser {
   /**
    * @inheritdoc
    */
-  public resolveColor(name: string, palette: IColorPalette): string | undefined {
+  public resolveColor(name: string, palette: IColorPalette, themeId?: string): string | undefined {
     try {
       Validator.notEmpty(name, 'Color name');
       Validator.required(palette, 'Color palette');
+
+      if (themeId && CUSTOM_COLORS[name]) {
+        const themeSpecificColorName = CUSTOM_COLORS[name][themeId];
+        if (themeSpecificColorName) {
+          return this.resolveColor(themeSpecificColorName, palette);
+        }
+      }
 
       if (palette.colors.has(name)) {
         return palette.colors.get(name);
@@ -710,6 +718,11 @@ class ThemeParser implements IThemeParser {
         }
       }
 
+      if (name.startsWith('#') && /^#[0-9A-Fa-f]{6}$/.test(name)) {
+        return name;
+      }
+
+      this.logger.debug(`Color not found: ${name}`);
       return undefined;
     } catch (error) {
       this.logger.debug(`Error resolving color ${name}: ${error instanceof Error ? error.message : String(error)}`);
@@ -930,6 +943,7 @@ const EDITOR_DEVEL: Readonly<Record<string, readonly string[]>> = Object.freeze(
 
   // Input control
   //
+  'input.background': Object.freeze(['bg-dim']),
 
   // Scrollbar control
   //
@@ -945,18 +959,23 @@ const EDITOR_DEVEL: Readonly<Record<string, readonly string[]>> = Object.freeze(
 
   // Activity Bar
   //
+  'activityBar.background': Object.freeze(['bg-dim']),
+  'activityBar.foreground': Object.freeze(['fg-main']),
+  'activityBar.inactiveForeground': Object.freeze(['fg-dim']),
 
   // Profiles
   //
 
   // Side Bar
   //
+  'sideBar.background': Object.freeze(['bg-tab-bar']),
 
   // Minimap
   //
 
   // Editor Groups & Tabs
   //
+  'editorGroupHeader.tabsBackground': Object.freeze(['bg-tab-bar']),
 
   // Editor colors
   //
@@ -975,6 +994,7 @@ const EDITOR_DEVEL: Readonly<Record<string, readonly string[]>> = Object.freeze(
 
   // Editor widget colors
   //
+  'editorWidget.background': Object.freeze(['bg-tab-bar']),
 
   // Peek view colors
   //
@@ -990,13 +1010,15 @@ const EDITOR_DEVEL: Readonly<Record<string, readonly string[]>> = Object.freeze(
 
   // Title Bar colors
   //
-  'titleBar.activeBackground': Object.freeze(['bg-main']),
+  'titleBar.activeBackground': Object.freeze(['bg-title-bar-active']);
 
   // Menu Bar colors
   //
 
   // Command Center colors
   //
+  'commandCenter.background': Object.freeze(['bg-dim']),
+  'commandCenter.border': Object.freeze(['border']),
 
   // Notification colors
   //
@@ -1174,6 +1196,28 @@ const THEME_DEFINITIONS: readonly IThemeDefinition[] = Object.freeze([
 ]);
 
 /**
+ * Custom theme-specific color mappings
+ *
+ * This provides a way to define colors that vary by theme variant
+ * without changing the core color resolution logic.
+ *
+ * @const
+ * @readonly
+ */
+const CUSTOM_COLORS: Readonly<Record<string, Readonly<Record<string, string>>>> = Object.freeze({
+  'bg-title-bar-active': Object.freeze({
+    'modus-operandi': 'bg-mode-line-active',
+    'modus-vivendi': 'bg-mode-line-active',
+    'modus-operandi-tinted': 'bg-mode-line-active',
+    'modus-vivendi-tinted': 'bg-mode-line-active',
+    'modus-operandi-deuteranopia': '#c8c8c8',
+    'modus-vivendi-deuteranopia': '#505050',
+    'modus-operandi-tritanopia': '#c8c8c8',
+    'modus-vivendi-tritanopia': '#505050'
+  }),
+});
+
+/**
  * Theme generator implementation
  * @implements IThemeGenerator
  */
@@ -1227,7 +1271,7 @@ class ThemeGenerator implements IThemeGenerator {
       const { id, name, type } = definition;
 
       const getColor = (colorName: string): string => {
-        const resolvedColor = this.parser.resolveColor(colorName, palette);
+        const resolvedColor = this.parser.resolveColor(colorName, palette, id);
         if (!resolvedColor) {
           throw new ThemeGenerationError(`Missing color: ${colorName} in theme ${id}`);
         }
@@ -1247,6 +1291,13 @@ class ThemeGenerator implements IThemeGenerator {
           if (modusColors.length > 0 && modusColors[0] !== '') {
             colors[vscodeId] = getColor(modusColors[0]);
           }
+        }
+      }
+
+      for (const [vscodeId, themeMapping] of Object.entries(CUSTOM_COLORS)) {
+        if (themeMapping[id]) {
+          const customColor = themeMapping[id];
+          colors[vscodeId] = getColor(customColor);
         }
       }
 
