@@ -1235,11 +1235,18 @@ class ThemeGenerator implements IThemeGenerator {
       };
 
       const colors: Record<string, string> = {};
-      const uiColorMappings = config.experimentalUiColors ? EDITOR_DEVEL : EDITOR;
 
-      for (const [vscodeId, modusColors] of Object.entries(uiColorMappings)) {
+      for (const [vscodeId, modusColors] of Object.entries(EDITOR)) {
         if (modusColors.length > 0 && modusColors[0] !== '') {
           colors[vscodeId] = getColor(modusColors[0]);
+        }
+      }
+
+      if (config.experimentalUiColors) {
+        for (const [vscodeId, modusColors] of Object.entries(EDITOR_DEVEL)) {
+          if (modusColors.length > 0 && modusColors[0] !== '') {
+            colors[vscodeId] = getColor(modusColors[0]);
+          }
         }
       }
 
