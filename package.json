@@ -69,12 +69,7 @@
     "configuration": {
       "title": "Modus Themes",
       "properties": {
-        "modus.debugMode": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable additional debug output in the Output panel"
-        },
-        "modus.experimentalUiColors": {
+        "modus.experimental": {
           "type": "boolean",
           "default": false,
           "description": "Enable experimental UI color mappings for development and testing"

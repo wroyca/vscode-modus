@@ -1,0 +1,58 @@
+[
+  {
+    "id": "modus-operandi",
+    "name": "Modus Operandi",
+    "type": "light",
+    "source": "upstream/modus-operandi-theme.el",
+    "description": "Elegant, highly legible theme with a white background"
+  },
+  {
+    "id": "modus-vivendi",
+    "name": "Modus Vivendi",
+    "type": "dark",
+    "source": "upstream/modus-vivendi-theme.el",
+    "description": "Elegant, highly legible theme with a black background"
+  },
+  {
+    "id": "modus-operandi-tinted",
+    "name": "Modus Operandi Tinted",
+    "type": "light",
+    "source": "upstream/modus-operandi-tinted-theme.el",
+    "description": "Light theme with a subtle cream tint (warm appearance)"
+  },
+  {
+    "id": "modus-vivendi-tinted",
+    "name": "Modus Vivendi Tinted",
+    "type": "dark",
+    "source": "upstream/modus-vivendi-tinted-theme.el",
+    "description": "Dark theme with a subtle blue tint (night sky appearance)"
+  },
+  {
+    "id": "modus-operandi-deuteranopia",
+    "name": "Modus Operandi Deuteranopia",
+    "type": "light",
+    "source": "upstream/modus-operandi-deuteranopia-theme.el",
+    "description": "Light theme with a subtle cream tint (warm appearance)"
+  },
+  {
+    "id": "modus-vivendi-deuteranopia",
+    "name": "Modus Vivendi Deuteranopia",
+    "type": "dark",
+    "source": "upstream/modus-vivendi-deuteranopia-theme.el",
+    "description": "Dark theme with a subtle blue tint (night sky appearance)"
+  },
+  {
+    "id": "modus-operandi-tritanopia",
+    "name": "Modus Operandi Tritanopia",
+    "type": "light",
+    "source": "upstream/modus-operandi-tritanopia-theme.el",
+    "description": "Light theme with a subtle cream tint (warm appearance)"
+  },
+  {
+    "id": "modus-vivendi-tritanopia",
+    "name": "Modus Vivendi Tritanopia",
+    "type": "dark",
+    "source": "upstream/modus-vivendi-tritanopia-theme.el",
+    "description": "Dark theme with a subtle blue tint (night sky appearance)"
+  }
+]
