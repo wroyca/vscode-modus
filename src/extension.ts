@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
+import * as fsSync from 'fs';
+import { Stats } from 'fs';
 import * as path from 'path';
 import { Disposable } from 'vscode';
 
 /**
- * Theme type enumeration
+ * Theme type enumeration that categorizes themes by luminance characteristics
  * @readonly
- * @enum {string}
  */
 enum ThemeType {
   LIGHT = 'light',
@@ -14,225 +15,280 @@ enum ThemeType {
 }
 
 /**
- * Extension configuration interface
- * @interface
+ * Base theme interface defining core properties that all theme variants must
+ * implement
  */
-interface IExtensionConfiguration {
-  /** User-defined color overrides */
-  readonly colorOverrides: ReadonlyMap<string, string>;
+interface ITheme {
+  /** Unique identifier for theme differentiation */
+  readonly id: string;
 
-  /** Additional debug output verbosity */
-  readonly debugMode: boolean;
+  /** Human-readable display name */
+  readonly name: string;
 
-  /** Enable experimental UI color mappings */
-  readonly experimentalUiColors: boolean;
+  /** Luminance classification */
+  readonly type: ThemeType;
 }
 
 /**
- * Theme definition interface
- * @interface
+ * Theme definition that extends the base theme with source metadata
  */
-interface IThemeDefinition {
-  /** Unique identifier for the theme */
-  readonly id: string;
+interface IThemeDefinition extends ITheme {
+  /** Relative path to the source definition file */
+  readonly source: string;
 
-  /** Display name for the theme */
-  readonly name: string;
-
-  /** Light or dark theme */
-  readonly type: ThemeType;
-
-  /** Path to source file relative to extension root */
-  readonly sourceFile: string;
-
-  /** Theme description for UI presentation */
+  /** User-facing descriptive text */
   readonly description: string;
 }
 
 /**
- * Color palette interface
- * @interface
+ * Base color specification interface
  */
-interface IColorPalette {
-  /** Direct color mappings (e.g., "blue-intense" -> "#0000FF") */
-  readonly colors: ReadonlyMap<string, string>;
+interface IColor {
+  /** Direct hexadecimal color values */
+  readonly hex: Record<string, string>;
 
-  /** Semantic mappings (e.g., "keyword" -> "magenta-cooler") */
-  readonly semantics: ReadonlyMap<string, string>;
+  /** Semantic color references that map to direct values */
+  readonly semantic: Record<string, string>;
 }
 
 /**
- * Token definition interface
- * @interface
+ * Extended color palette with theme-specific variant support
  */
-interface ITokenStyle {
-  /** TextMate scope selectors */
-  readonly scope: readonly string[] | string;
+interface IColorPalette extends IColor {
+  /** Theme-specific color overrides organized by theme identifier */
+  readonly variants?: Record<string, Record<string, string>>;
+}
 
-  /** Token style settings */
-  readonly settings: {
-    /** Foreground color as hex */
+/**
+ * Token styling specification
+ */
+interface IToken {
+  readonly style: string | {
     readonly foreground?: string;
-
-    /** Font styling (bold, italic, etc) */
     readonly fontStyle?: string;
-
-    /** Background color as hex (rarely used) */
     readonly background?: string;
   };
 }
 
 /**
- * VS Code theme output interface
- * @interface
+ * TextMate token specification
  */
-interface IVSCodeTheme {
-  /** Theme display name */
-  readonly name: string;
-
-  /** Light or dark theme type */
-  readonly type: ThemeType;
-
-  /** UI color definitions */
-  readonly colors: Readonly<Record<string, string>>;
-
-  /** Syntax token styling */
-  readonly tokenColors: readonly ITokenStyle[];
-
-  /** Semantic token color customizations (optional) */
-  readonly semanticTokenColors?: Readonly<Record<string, string | ITokenStyle['settings']>>;
+interface ITextMateToken extends IToken {
+  /** TextMate scope selector pattern */
+  readonly scope: string | string[];
 }
 
 /**
- * Base theme service interface
- * @interface
+ * Semantic token specification
  */
-interface IThemeService {
+interface ISemanticToken extends IToken {
+  /** Semantic token type identifier */
+  readonly type: string;
+}
+
+/**
+ * VS Code specific theme format
+ */
+interface IThemeVSC extends ITheme {
+  /** Editor color definitions for VS Code components */
+  readonly colors: Record<string, string>;
+
+  /** Token styling specifications organized by token system */
+  readonly tokens: {
+    readonly textMate: ITextMateToken[];
+    readonly semantic: ISemanticToken[];
+  };
+}
+
+/**
+ * Editor element to color mapping specification
+ */
+interface IEditorMapping {
+  /** Editor element identifier in the VS Code schema */
+  readonly element: string;
+
+  /** Color reference to be resolved against the palette */
+  readonly color: string;
+}
+
+/**
+ * Token to color mapping specification
+ */
+interface ITokenMapping {
+  /** Token identification pattern */
+  readonly scopeOrType: string;
+
+  /** Color reference to be resolved against the palette */
+  readonly color: string;
+}
+
+/**
+ * User configuration schema
+ */
+interface IConfiguration {
+  /** User-defined color customizations */
+  readonly colorOverrides: Record<string, string>;
+
+  /** Flag for experimental functionality */
+  readonly experimental: boolean;
+}
+
+/**
+ * File system observation service
+ */
+interface IFileWatcher {
   /**
-   * Generate theme files from source definitions
-   * @param extensionPath - Path to the extension
+   * Establish observation of a specific file
+   *
+   * @param path - Path to the file to observe
+   * @param callback - Function to invoke upon detected changes
+   * @returns Disposable resource for managing the observation lifecycle
+   */
+  watchFile(path: string, callback: () => void): Disposable;
+
+  /**
+   * Establish observation of a directory and its contents
+   *
+   * @param path - Path to the directory to observe
+   * @param callback - Function to invoke upon detected changes
+   * @returns Disposable resource for managing the observation lifecycle
+   */
+  watchDir(path: string, callback: () => void): Disposable;
+}
+
+/**
+ * Configuration repository
+ */
+interface IConfigurationRepository {
+  /**
+   * Retrieve current configuration state
+   *
+   * @returns Current configuration values
+   */
+  retrieveConfiguration(): IConfiguration;
+
+  /**
+   * Register for configuration change notifications
+   *
+   * @param handler - Callback function for configuration changes
+   * @returns Disposable resource for managing the subscription lifecycle
+   */
+  onConfigurationChanged(handler: (config: IConfiguration) => void): Disposable;
+}
+
+/**
+ * Theme analysis service
+ */
+interface IThemeAnalyzer {
+  /**
+   * Analyze a theme source file and extract color definitions
+   *
+   * @param path - Path to the theme source file
+   * @returns Promise resolving to the extracted color definitions
+   */
+  analyzeSource(path: string): Promise<IColor>;
+
+  /**
+   * Load extension data for palette customization
+   *
+   * @param path - Path to the extensions file
+   * @returns Promise resolving to the palette extensions
+   */
+  loadExtensions(path: string): Promise<IColorPalette>;
+
+  /**
+   * Merge multiple color sources into a unified palette
+   *
+   * @param base - Base color definitions
+   * @param extensions - Extension color definitions
+   * @param overrides - User override color definitions
+   * @param themeId - Target theme identifier
+   * @returns Unified color palette
+   */
+  mergeColorSources(base: IColor, extensions: IColorPalette, overrides: Record<string, string>, themeId: string): IColorPalette;
+
+  /**
+   * Resolve a symbolic color name to its concrete hex value
+   *
+   * @param name - Color name or reference
+   * @param palette - Color palette to resolve against
+   * @returns Resolved hex color value or undefined if not resolvable
+   */
+  resolveColorReference(name: string, palette: IColorPalette): string | undefined;
+}
+
+/**
+ * Theme generation service
+ */
+interface IThemeFactory {
+  /**
+   * Synthesize VS Code theme from components
+   *
+   * @param theme - Theme definition metadata
+   * @param palette - Color palette for token and editor coloring
+   * @param editorMappings - Editor element color assignments
+   * @param tokenMappings - Token color assignments
+   * @returns Constructed VS Code theme
+   */
+  synthesizeTheme(
+    theme: IThemeDefinition,
+    palette: IColorPalette,
+    editorMappings: IEditorMapping[],
+    tokenMappings: ITokenMapping[]
+  ): IThemeVSC;
+}
+
+/**
+ * Theme serialization service
+ */
+interface IThemeSerializer {
+  /**
+   * Serialize theme to VS Code's format specification
+   *
+   * @param theme - Internal theme representation
+   * @returns VS Code compatible theme object
+   */
+  serialize(theme: IThemeVSC): any;
+}
+
+/**
+ * Theme orchestration service
+ */
+interface IThemeOrchestrator {
+  /**
+   * Generate all themes from source definitions
+   *
+   * @param extensionPath - Path to the extension root
    * @param config - User configuration
-   * @returns Promise that resolves when generation is complete
+   * @returns Promise that resolves when generation completes
    */
-  generateThemes(extensionPath: string, config: IExtensionConfiguration): Promise<void>;
+  generateAllThemes(extensionPath: string, config: IConfiguration): Promise<void>;
+
+  /**
+   * Detect modifications to source files
+   *
+   * @param extensionPath - Path to the extension root
+   * @returns Promise resolving to true if changes detected
+   */
+  detectSourceModifications(extensionPath: string): Promise<boolean>;
 }
 
 /**
- * Theme parser interface
- * @interface
+ * Domain-specific error for theme processing
  */
-interface IThemeParser {
-  /**
-   * Parse a theme file into a color palette
-   * @param filePath - Path to the theme file
-   * @returns Promise resolving to the parsed color palette
-   */
-  parseThemeFile(filePath: string): Promise<IColorPalette>;
-
-  /**
-   * Apply overrides to a color palette
-   * @param palette - Original color palette
-   * @param overrides - User-defined overrides
-   * @returns New palette with overrides applied
-   */
-  applyOverrides(palette: IColorPalette, overrides: ReadonlyMap<string, string>): IColorPalette;
-
-  /**
-   * Resolve a color name to its actual hex value
-   * @param name - Color name to resolve
-   * @param palette - Palette to resolve against
-   * @param themeId - Optional theme identifier
-   * @returns Resolved hex color or undefined if not found
-   */
-  resolveColor(name: string, palette: IColorPalette, themeId?: string): string | undefined;
-}
-
-/**
- * Theme generator interface
- * @interface
- */
-interface IThemeGenerator {
-  /**
-   * Generate a VS Code theme from a color palette
-   * @param palette - Color palette to use
-   * @param definition - Theme definition
-   * @param config - User configuration
-   * @returns Complete VS Code theme
-   */
-  generateTheme(palette: IColorPalette, definition: IThemeDefinition, config: IExtensionConfiguration): IVSCodeTheme;
-}
-
-/**
- * Configuration service interface
- * @interface
- */
-interface IConfigurationService {
-  /**
-   * Get current configuration
-   * @returns Current configuration object
-   */
-  getConfiguration(): IExtensionConfiguration;
-
-  /**
-   * Register a handler for configuration changes
-   * @param handler - Callback to invoke when configuration changes
-   * @returns Disposable to unregister the handler
-   */
-  onConfigurationChanged(handler: (config: IExtensionConfiguration) => void): Disposable;
-}
-
-/**
- * Logger interface
- * @interface
- */
-interface ILogger {
-  /**
-   * Log informational message
-   * @param message - Message to log
-   */
-  info(message: string): void;
-
-  /**
-   * Log debug message (only in debug mode)
-   * @param message - Message to log
-   */
-  debug(message: string): void;
-
-  /**
-   * Log warning message
-   * @param message - Warning message
-   */
-  warn(message: string): void;
-
-  /**
-   * Log error message
-   * @param message - Error message
-   * @param error - Optional error object
-   */
-  error(message: string, error?: unknown): void;
-
-  /**
-   * Show the log to the user
-   */
-  show(): void;
-}
-
-/**
- * Base error class for the extension
- * @extends Error
- */
-class ModusThemeError extends Error {
-  /** Error code for categorization */
+class ThemeProcessingError extends Error {
+  /** Error classification code */
   public readonly code: string;
 
-  /** Original error if this is a wrapper */
+  /** Original error that triggered this error */
   public readonly cause?: Error;
 
   /**
-   * Create a new ModusThemeError
-   * @param message - Error message
-   * @param code - Error code
-   * @param cause - Original error if applicable
+   * Construct a new theme processing error
+   *
+   * @param message - Descriptive error message
+   * @param code - Error classification code
+   * @param cause - Original triggering error if applicable
    */
   constructor(message: string, code: string, cause?: Error) {
     super(message);
@@ -247,305 +303,83 @@ class ModusThemeError extends Error {
 }
 
 /**
- * Error thrown when theme parsing fails
- * @extends ModusThemeError
+ * File system observer implementation
  */
-class ThemeParseError extends ModusThemeError {
+class FileSystemWatcher implements IFileWatcher {
   /**
-   * Create a new ThemeParseError
-   * @param message - Error message
-   * @param cause - Original error if applicable
+   * Establish file observation
+   *
+   * @param filePath - Path to the file to observe
+   * @param callback - Function to invoke on file changes
+   * @returns Disposable for observation lifecycle management
    */
-  constructor(message: string, cause?: Error) {
-    super(message, 'THEME_PARSE_ERROR', cause);
+  public watchFile(filePath: string, callback: () => void): Disposable {
+    const watcher = fsSync.watch(filePath, () => {
+      callback();
+    });
+
+    return new Disposable(() => {
+      watcher.close();
+    });
+  }
+
+  /**
+   * Establish directory observation
+   *
+   * @param dirPath - Path to the directory to observe
+   * @param callback - Function to invoke on directory changes
+   * @returns Disposable for observation lifecycle management
+   */
+  public watchDir(dirPath: string, callback: () => void): Disposable {
+    const watcher = fsSync.watch(dirPath, { recursive: true }, () => {
+      callback();
+    });
+
+    return new Disposable(() => {
+      watcher.close();
+    });
   }
 }
 
 /**
- * Error thrown when theme generation fails
- * @extends ModusThemeError
+ * Configuration repository implementation
  */
-class ThemeGenerationError extends ModusThemeError {
+class ConfigurationRepository implements IConfigurationRepository {
   /**
-   * Create a new ThemeGenerationError
-   * @param message - Error message
-   * @param cause - Original error if applicable
+   * Retrieve current configuration values
+   *
+   * @returns Current configuration state
    */
-  constructor(message: string, cause?: Error) {
-    super(message, 'THEME_GENERATION_ERROR', cause);
-  }
-}
-
-/**
- * Error thrown when file operations fail
- * @extends ModusThemeError
- */
-class FileOperationError extends ModusThemeError {
-  /**
-   * Create a new FileOperationError
-   * @param message - Error message
-   * @param cause - Original error if applicable
-   */
-  constructor(message: string, cause?: Error) {
-    super(message, 'FILE_OPERATION_ERROR', cause);
-  }
-}
-
-/**
- * Error thrown for configuration issues
- * @extends ModusThemeError
- */
-class ConfigurationError extends ModusThemeError {
-  /**
-   * Create a new ConfigurationError
-   * @param message - Error message
-   * @param cause - Original error if applicable
-   */
-  constructor(message: string, cause?: Error) {
-    super(message, 'CONFIGURATION_ERROR', cause);
-  }
-}
-
-/**
- * Validation utilities
- */
-class Validator {
-  /**
-   * Ensure a value is not null or undefined
-   * @param value - Value to check
-   * @param name - Name for error message
-   * @throws Error if value is null or undefined
-   * @returns The original value
-   */
-  static required<T>(value: T | null | undefined, name: string): T {
-    if (value === null || value === undefined) {
-      throw new Error(`${name} is required but was ${value}`);
-    }
-    return value;
-  }
-
-  /**
-   * Ensure a string is not empty
-   * @param value - String to check
-   * @param name - Name for error message
-   * @throws Error if string is empty
-   * @returns The original string
-   */
-  static notEmpty(value: string, name: string): string {
-    if (!value) {
-      throw new Error(`${name} cannot be empty`);
-    }
-    return value;
-  }
-
-  /**
-   * Validate a hex color string
-   * @param value - Color to validate
-   * @param name - Name for error message
-   * @throws Error if not a valid hex color
-   * @returns The validated color
-   */
-  static hexColor(value: string, name: string): string {
-    if (!/^#[0-9A-Fa-f]{6}$/.test(value)) {
-      throw new Error(`${name} must be a valid hex color (e.g. #FF0000), got ${value}`);
-    }
-    return value;
-  }
-
-  /**
-   * Validate a theme definition
-   * @param def - Theme definition to validate
-   * @throws Error if definition is invalid
-   * @returns The validated definition
-   */
-  static themeDefinition(def: IThemeDefinition): IThemeDefinition {
-    this.required(def, 'Theme definition');
-    this.notEmpty(def.id, 'Theme ID');
-    this.notEmpty(def.name, 'Theme name');
-    this.notEmpty(def.sourceFile, 'Theme source file');
-
-    if (def.type !== ThemeType.LIGHT && def.type !== ThemeType.DARK) {
-      throw new Error(`Theme type must be '${ThemeType.LIGHT}' or '${ThemeType.DARK}', got '${def.type}'`);
-    }
-
-    return def;
-  }
-}
-
-/**
- * Logger implementation
- * @implements ILogger
- */
-class Logger implements ILogger {
-  private static instance: Logger;
-  private outputChannel: vscode.OutputChannel | null = null;
-  private debugEnabled = false;
-
-  /**
-   * Create a new Logger
-   * @private
-   */
-  private constructor() {
-    // Defer creating the output channel until needed
-  }
-
-  /**
-   * Get the logger instance (singleton pattern)
-   * @returns Logger instance
-   */
-  public static getInstance(): Logger {
-    if (!Logger.instance) {
-      Logger.instance = new Logger();
-    }
-    return Logger.instance;
-  }
-
-  /**
-   * Set debug mode
-   * @param enabled - Whether debug logging is enabled
-   */
-  public setDebugMode(enabled: boolean): void {
-    this.debugEnabled = enabled;
-  }
-
-  /**
-   * Ensure the output channel is initialized
-   * @private
-   */
-  private ensureOutputChannel(): vscode.OutputChannel {
-    if (!this.outputChannel) {
-      this.outputChannel = vscode.window.createOutputChannel('Modus Themes');
-    }
-    return this.outputChannel;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public info(message: string): void {
-    this.ensureOutputChannel().appendLine(`[INFO] ${this.getTimestamp()} ${message}`);
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public debug(message: string): void {
-    if (this.debugEnabled) {
-      this.ensureOutputChannel().appendLine(`[DEBUG] ${this.getTimestamp()} ${message}`);
-    }
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public warn(message: string): void {
-    this.ensureOutputChannel().appendLine(`[WARN] ${this.getTimestamp()} ${message}`);
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public error(message: string, error?: unknown): void {
-    this.ensureOutputChannel().appendLine(`[ERROR] ${this.getTimestamp()} ${message}`);
-    if (error) {
-      if (error instanceof ModusThemeError) {
-        this.ensureOutputChannel().appendLine(`  Code: ${error.code}`);
-        this.ensureOutputChannel().appendLine(`  Message: ${error.message}`);
-        if (error.cause) {
-          this.ensureOutputChannel().appendLine(`  Cause: ${error.cause.message}`);
-          if (error.cause.stack) {
-            this.ensureOutputChannel().appendLine(`  Stack: ${error.cause.stack}`);
-          }
-        }
-      } else if (error instanceof Error) {
-        this.ensureOutputChannel().appendLine(`  ${error.message}`);
-        if (error.stack) {
-          this.ensureOutputChannel().appendLine(`  ${error.stack}`);
-        }
-      } else {
-        this.ensureOutputChannel().appendLine(`  ${String(error)}`);
-      }
-    }
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public show(): void {
-    this.ensureOutputChannel().show();
-  }
-
-  /**
-   * Get a timestamp for logging
-   * @private
-   * @returns Formatted timestamp
-   */
-  private getTimestamp(): string {
-    const now = new Date();
-    return now.toISOString();
-  }
-}
-
-/**
- * Configuration service implementation
- * @implements IConfigurationService
- */
-class ConfigurationService implements IConfigurationService {
-  private static instance: ConfigurationService;
-
-  /**
-   * Create a new ConfigurationService instance
-   * @private
-   */
-  private constructor() { }
-
-  /**
-   * Get the configuration service instance (singleton pattern)
-   * @returns ConfigurationService instance
-   */
-  public static getInstance(): ConfigurationService {
-    if (!ConfigurationService.instance) {
-      ConfigurationService.instance = new ConfigurationService();
-    }
-    return ConfigurationService.instance;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public getConfiguration(): IExtensionConfiguration {
+  public retrieveConfiguration(): IConfiguration {
     try {
       const config = vscode.workspace.getConfiguration('modus');
-      const debugMode = config.get<boolean>('debugMode', false);
-      const experimentalUiColors = config.get<boolean>('experimentalUiColors', false);
-      const overrides = config.get<Record<string, string>>('colorOverrides', {});
-      const colorOverrides = new Map<string, string>();
-
-      for (const [key, value] of Object.entries(overrides)) {
-        colorOverrides.set(key, value);
-      }
 
       return {
-        colorOverrides,
-        debugMode,
-        experimentalUiColors
+        colorOverrides: config.get<Record<string, string>>('colorOverrides', {}),
+        experimental: config.get<boolean>('experimental', false)
       };
     } catch (error) {
-      throw new ConfigurationError('Failed to load configuration', error instanceof Error ? error : undefined);
+      return {
+        colorOverrides: {},
+        experimental: false
+      };
     }
   }
 
   /**
-   * @inheritdoc
+   * Register for configuration change events
+   *
+   * @param handler - Callback for configuration changes
+   * @returns Disposable for subscription lifecycle management
    */
-  public onConfigurationChanged(handler: (config: IExtensionConfiguration) => void): Disposable {
+  public onConfigurationChanged(handler: (config: IConfiguration) => void): Disposable {
     return vscode.workspace.onDidChangeConfiguration(event => {
       if (event.affectsConfiguration('modus')) {
         try {
-          const newConfig = this.getConfiguration();
+          const newConfig = this.retrieveConfiguration();
           handler(newConfig);
         } catch (error) {
-          Logger.getInstance().error('Error handling configuration change', error);
+          console.error('Error processing configuration changes', error);
         }
       }
     });
@@ -553,1046 +387,815 @@ class ConfigurationService implements IConfigurationService {
 }
 
 /**
- * Theme parser implementation
- * @implements IThemeParser
+ * Modus theme source analyzer implementation
  */
-class ThemeParser implements IThemeParser {
-  private static instance: ThemeParser;
-  private readonly logger: ILogger;
-
+class ModusThemeAnalyzer implements IThemeAnalyzer {
   /**
-   * Create a new ThemeParser
-   * @private
+   * Analyze a Modus theme source file
+   *
+   * @param filePath - Path to the Modus theme file
+   * @returns Promise resolving to extracted color definitions
    */
-  private constructor() {
-    this.logger = Logger.getInstance();
-  }
-
-  /**
-   * Get the parser instance (singleton pattern)
-   * @returns ThemeParser instance
-   */
-  public static getInstance(): ThemeParser {
-    if (!ThemeParser.instance) {
-      ThemeParser.instance = new ThemeParser();
+  public async analyzeSource(filePath: string): Promise<IColor> {
+    if (!filePath) {
+      throw new ThemeProcessingError('File path is required', 'INVALID_PATH');
     }
-    return ThemeParser.instance;
-  }
 
-  /**
-   * @inheritdoc
-   */
-  public async parseThemeFile(filePath: string): Promise<IColorPalette> {
     try {
-      Validator.notEmpty(filePath, 'File path');
-
-      let content: string;
-      try {
-        content = await fs.readFile(filePath, 'utf8');
-      } catch (error) {
-        throw new FileOperationError(`Failed to read theme file: ${filePath}`,
-          error instanceof Error ? error : undefined);
-      }
-
-      const colors = new Map<string, string>();
-      const semantics = new Map<string, string>();
-
-      // Helper lambda for extracting regex matches
-      //
-      const parse = (r: RegExp, matcher: (m: RegExpExecArray) => void): void => {
-        let m: RegExpExecArray | null;
-        while ((m = r.exec(content)) !== null) {
-          matcher(m);
-        }
-      };
+      const content = await fs.readFile(filePath, 'utf8');
+      const hex: Record<string, string> = {};
+      const semantic: Record<string, string> = {};
 
       // (color-name "#RRGGBB")
       //
-      parse(
-        /\(([a-zA-Z0-9-]+)\s+"(#[0-9a-fA-F]{6})"\)/g,
-        (m) => colors.set(m[1], m[2])
-      );
+      const colorRegex = /\(([a-zA-Z0-9-]+)\s+"(#[0-9a-fA-F]{6})"\)/g;
+      let match;
+      while ((match = colorRegex.exec(content)) !== null) {
+        hex[match[1]] = match[2];
+      }
 
       // (semantic-name color-name)
       //
-      parse(
-        /\(([a-zA-Z0-9-]+)\s+(?!#)([a-zA-Z0-9-]+)\)/g,
-        (m) => semantics.set(m[1], m[2])
-      );
-
-      if (colors.size === 0) {
-        throw new ThemeParseError(`No colors found in theme file: ${filePath}`);
+      const semanticRegex = /\(([a-zA-Z0-9-]+)\s+(?!#)([a-zA-Z0-9-]+)\)/g;
+      while ((match = semanticRegex.exec(content)) !== null) {
+        semantic[match[1]] = match[2];
       }
 
-      this.logger.debug(`Parsed palette: ${colors.size} colors, ${semantics.size} semantic mappings`);
+      if (Object.keys(hex).length === 0) {
+        throw new ThemeProcessingError(`No color definitions found in ${filePath}`, 'PARSE_ERROR');
+      }
 
-      return Object.freeze({
-        colors: Object.freeze(colors),
-        semantics: Object.freeze(semantics)
-      });
+      return { hex, semantic };
     } catch (error) {
-      if (error instanceof ModusThemeError) {
+      if (error instanceof ThemeProcessingError) {
         throw error;
       }
-      throw new ThemeParseError(
-        `Failed to parse theme file: ${error instanceof Error ? error.message : String(error)}`,
+      throw new ThemeProcessingError(
+        `Failed to analyze theme source: ${error instanceof Error ? error.message : String(error)}`,
+        'PARSE_ERROR',
         error instanceof Error ? error : undefined
       );
     }
   }
 
   /**
-   * @inheritdoc
+   * Load palette extensions from JSON file
+   *
+   * @param filePath - Path to extensions JSON file
+   * @returns Promise resolving to the palette extensions
    */
-  public applyOverrides(palette: IColorPalette, overrides: ReadonlyMap<string, string>): IColorPalette {
+  public async loadExtensions(filePath: string): Promise<IColorPalette> {
     try {
-      Validator.required(palette, 'Color palette');
-      Validator.required(overrides, 'Overrides map');
+      const content = await fs.readFile(filePath, 'utf8');
+      const extensions = JSON.parse(content) as IColorPalette;
+      return extensions;
+    } catch (error) {
+      return { hex: {}, semantic: {} };
+    }
+  }
 
-      const colors = new Map(palette.colors);
-      const semantics = new Map(palette.semantics);
+  /**
+   * Merge multiple color sources into unified palette
+   *
+   * @param base - Base color definitions
+   * @param extensions - Extension color definitions
+   * @param overrides - User override color definitions
+   * @param themeId - Target theme identifier
+   * @returns Unified color palette
+   */
+  public mergeColorSources(
+    base: IColor,
+    extensions: IColorPalette,
+    overrides: Record<string, string>,
+    themeId: string
+  ): IColorPalette {
+    const result: IColorPalette = {
+      hex: { ...base.hex },
+      semantic: { ...base.semantic }
+    };
 
-      for (const [key, value] of overrides.entries()) {
-        Validator.notEmpty(key, 'Override key');
-        Validator.notEmpty(value, 'Override value');
+    Object.assign(result.hex, extensions.hex || {});
+    Object.assign(result.semantic, extensions.semantic || {});
 
+    if (extensions.variants && extensions.variants[themeId]) {
+      Object.entries(extensions.variants[themeId]).forEach(([key, value]) => {
         if (value.startsWith('#')) {
-          try {
-            Validator.hexColor(value, `Override for ${key}`);
-            colors.set(key, value);
-            this.logger.debug(`Applied color override: ${key} -> ${value}`);
-          } catch (error) {
-            this.logger.warn(`Skipping invalid color override: ${key}=${value}`);
-          }
+          result.hex[key] = value;
         } else {
-          semantics.set(key, value);
-          this.logger.debug(`Applied semantic override: ${key} -> ${value}`);
+          result.semantic[key] = value;
         }
-      }
-
-      return Object.freeze({
-        colors: Object.freeze(colors),
-        semantics: Object.freeze(semantics)
       });
-    } catch (error) {
-      if (error instanceof ModusThemeError) {
-        throw error;
-      }
-      throw new ThemeParseError(
-        `Failed to apply overrides: ${error instanceof Error ? error.message : String(error)}`,
-        error instanceof Error ? error : undefined
-      );
     }
+
+    Object.entries(overrides).forEach(([key, value]) => {
+      if (value.startsWith('#')) {
+        result.hex[key] = value;
+      } else {
+        result.semantic[key] = value;
+      }
+    });
+
+    return result;
   }
 
   /**
-   * @inheritdoc
+   * Resolve a symbolic color reference to its hex value
+   *
+   * @param name - Color name or reference
+   * @param palette - Color palette to resolve against
+   * @returns Resolved hex color value or undefined if not resolvable
    */
-  public resolveColor(name: string, palette: IColorPalette, themeId?: string): string | undefined {
-    try {
-      Validator.notEmpty(name, 'Color name');
-      Validator.required(palette, 'Color palette');
-
-      if (themeId && CUSTOM_COLORS[name]) {
-        const themeSpecificColorName = CUSTOM_COLORS[name][themeId];
-        if (themeSpecificColorName) {
-          return this.resolveColor(themeSpecificColorName, palette);
-        }
-      }
-
-      if (palette.colors.has(name)) {
-        return palette.colors.get(name);
-      }
-
-      // Follow semantic mappings (with cycle detection)
-      //
-      const visited = new Set<string>();
-      let current = name;
-
-      while (palette.semantics.has(current) && !visited.has(current)) {
-        visited.add(current);
-        current = palette.semantics.get(current)!;
-
-        if (palette.colors.has(current)) {
-          return palette.colors.get(current);
-        }
-      }
-
-      if (name.startsWith('#') && /^#[0-9A-Fa-f]{6}$/.test(name)) {
-        return name;
-      }
-
-      this.logger.debug(`Color not found: ${name}`);
-      return undefined;
-    } catch (error) {
-      this.logger.debug(`Error resolving color ${name}: ${error instanceof Error ? error.message : String(error)}`);
+  public resolveColorReference(name: string, palette: IColorPalette): string | undefined {
+    if (!name || name.trim() === '') {
       return undefined;
     }
+
+    if (name.startsWith('#')) {
+      return name;
+    }
+
+    if (palette.hex[name]) {
+      return palette.hex[name];
+    }
+
+    if (palette.semantic[name]) {
+      return this.resolveColorReference(palette.semantic[name], palette);
+    }
+
+    if (palette.variants) {
+      for (const [themeId, overrides] of Object.entries(palette.variants)) {
+        if (overrides[name]) {
+          return this.resolveColorReference(overrides[name], palette);
+        }
+      }
+    }
+
+    throw new ThemeProcessingError(
+      `Invalid color reference: "${name}" not found in palette`,
+      'COLOR_REFERENCE_ERROR'
+    );
   }
 }
 
 /**
- * TextMate scope mappings for syntax highlighting
- *
- * Tokens auto-generated from
- * https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide#standard-token-types-and-modifiers
- *
- * @const
- * @readonly
+ * Theme factory implementation
  */
-const TEXTMATE: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  'comment': Object.freeze(['comment']),
-  'string':  Object.freeze(['string']),
-  'keyword': Object.freeze(['keyword']),
-});
-
-/**
- * VS Code UI color mappings
- *
- * Tokens auto-generated from
- * https://code.visualstudio.com/api/references/theme-color
- *
- * NOTE: Values are currently placeholders and need to be updated.
- *
- * @const
- * @readonly
- */
-const EDITOR: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  // Text colors
-  //
-
-  // Action colors
-  //
-
-  // Button control
-  //
-
-  // Dropdown control
-  //
-
-  // Input control
-  //
-
-  // Scrollbar control
-  //
-
-  // Badge
-  //
-
-  // Progress bar
-  //
-
-  // Lists and trees
-  //
-
-  // Activity Bar
-  //
-
-  // Profiles
-  //
-
-  // Side Bar
-  //
-
-  // Minimap
-  //
-
-  // Editor Groups & Tabs
-  //
-
-  // Editor colors
-  //
-  'editor.background': Object.freeze(['bg-main']),
-  'editor.foreground': Object.freeze(['fg-main']),
-
-  // Diff editor colors
-  //
-
-  // Chat colors
-  //
-
-  // Inline Chat colors
-  //
-
-  // Panel Chat colors
-  //
-
-  // Editor widget colors
-  //
-
-  // Peek view colors
-  //
-
-  // Merge conflicts colors
-  //
-
-  // Panel colors
-  //
-
-  // Status Bar colors
-  //
-
-  // Title Bar colors
-  //
-
-  // Menu Bar colors
-  //
-
-  // Command Center colors
-  //
-
-  // Notification colors
-  //
-
-  // Banner colors
-  //
-
-  // Extensions colors
-  //
-
-  // Quick picker colors
-  //
-
-  // Keybinding label colors
-  //
-
-  // Keyboard shortcut table colors
-  //
-
-  // Integrated Terminal colors
-  //
-
-  // Debug colors
-  //
-
-  // Testing colors
-  //
-
-  // Welcome page colors
-  //
-
-  // Git colors
-  //
-
-  // Source Control Graph colors
-  //
-
-  // Settings Editor colors
-  //
-
-  // Breadcrumbs colors
-  //
-
-  // Snippets colors
-  //
-
-  // Symbol Icons colors
-  //
-
-  // Debug Icons colors
-  //
-
-  // Notebook colors
-  //
-
-  // Chart colors
-  //
-
-  // Ports colors
-  //
-
-  // Comments View colors
-  //
-
-  // Action Bar colors
-  //
-
-  // Simple Find Widget colors
-  //
-
-  // Gauge colors
-  //
-
-  // Extension colors
-  //
-});
-
-/**
- * Experimental UI mappings.
- *
- * This is highly experimental, and everything is subject to change. Expect
- * potential issues such as incorrect contrast, color mismatches, and other
- * visual inconsistencies. Use it only if you're willing to contribute or can
- * tolerate any problems that may arise.
- *
- * @const
- * @readonly
- */
-const EDITOR_DEVEL: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  // Text colors
-  //
-
-  // Action colors
-  //
-
-  // Button control
-  //
-
-  // Dropdown control
-  //
-
-  // Input control
-  //
-  'input.background': Object.freeze(['bg-dim']),
-
-  // Scrollbar control
-  //
-
-  // Badge
-  //
-
-  // Progress bar
-  //
-
-  // Lists and trees
-  //
-
-  // Activity Bar
-  //
-  'activityBar.background': Object.freeze(['bg-dim']),
-  'activityBar.foreground': Object.freeze(['fg-main']),
-  'activityBar.inactiveForeground': Object.freeze(['fg-dim']),
-
-  // Profiles
-  //
-
-  // Side Bar
-  //
-  'sideBar.background': Object.freeze(['bg-tab-bar']),
-
-  // Minimap
-  //
-
-  // Editor Groups & Tabs
-  //
-  'editorGroupHeader.tabsBackground': Object.freeze(['bg-tab-bar']),
-
-  // Editor colors
-  //
-
-  // Diff editor colors
-  //
-
-  // Chat colors
-  //
-
-  // Inline Chat colors
-  //
-
-  // Panel Chat colors
-  //
-
-  // Editor widget colors
-  //
-  'editorWidget.background': Object.freeze(['bg-tab-bar']),
-
-  // Peek view colors
-  //
-
-  // Merge conflicts colors
-  //
-
-  // Panel colors
-  //
-
-  // Status Bar colors
-  //
-
-  // Title Bar colors
-  //
-  'titleBar.activeBackground': Object.freeze(['bg-title-bar-active']);
-
-  // Menu Bar colors
-  //
-
-  // Command Center colors
-  //
-  'commandCenter.background': Object.freeze(['bg-dim']),
-  'commandCenter.border': Object.freeze(['border']),
-
-  // Notification colors
-  //
-
-  // Banner colors
-  //
-
-  // Extensions colors
-  //
-
-  // Quick picker colors
-  //
-
-  // Keybinding label colors
-  //
-
-  // Keyboard shortcut table colors
-  //
-
-  // Integrated Terminal colors
-  //
-
-  // Debug colors
-  //
-
-  // Testing colors
-  //
-
-  // Welcome page colors
-  //
-
-  // Git colors
-  //
-
-  // Source Control Graph colors
-  //
-
-  // Settings Editor colors
-  //
-
-  // Breadcrumbs colors
-  //
-
-  // Snippets colors
-  //
-
-  // Symbol Icons colors
-  //
-
-  // Debug Icons colors
-  //
-
-  // Notebook colors
-  //
-
-  // Chart colors
-  //
-
-  // Ports colors
-  //
-
-  // Comments View colors
-  //
-
-  // Action Bar colors
-  //
-
-  // Simple Find Widget colors
-  //
-
-  // Gauge colors
-  //
-
-  // Extension colors
-  //
-});
-
-/**
- * Semantic token mappings
- *
- * Tokens auto-generated from
- * https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide#standard-token-types-and-modifiers
- *
- * @const
- * @readonly
- */
-const SEMANTIC: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  'namespace':      Object.freeze(['']),
-  'class':          Object.freeze(['']),
-  'enum':           Object.freeze(['']),
-  'interface':      Object.freeze(['']),
-  'struct':         Object.freeze(['']),
-  'typeParameter':  Object.freeze(['']),
-  'type':           Object.freeze(['type']),
-  'parameter':      Object.freeze(['']),
-  'variable':       Object.freeze(['variable']),
-  'property':       Object.freeze(['']),
-  'enumMember':     Object.freeze(['']),
-  'decorator':      Object.freeze(['']),
-  'event':          Object.freeze(['']),
-  'function':       Object.freeze(['fnname']),
-  'method':         Object.freeze(['fnname']), // NOTE: Same as function
-  'macro':          Object.freeze(['']),
-  'label':          Object.freeze(['']),
-  'comment':        Object.freeze(['comment']),
-  'string':         Object.freeze(['string']),
-  'keyword':        Object.freeze(['keyword']),
-  'number':         Object.freeze(['number']),
-  'regexp':         Object.freeze(['rx-construct']),
-  'operator':       Object.freeze(['operator']),
-});
-
-/**
- * Theme definitions
- * @const
- * @readonly
- */
-const THEME_DEFINITIONS: readonly IThemeDefinition[] = Object.freeze([
-  Object.freeze({
-    id: 'modus-operandi',
-    name: 'Modus Operandi',
-    type: ThemeType.LIGHT,
-    sourceFile: 'upstream/modus-operandi-theme.el',
-    description: 'Elegant, highly legible theme with a white background'
-  }),
-  Object.freeze({
-    id: 'modus-vivendi',
-    name: 'Modus Vivendi',
-    type: ThemeType.DARK,
-    sourceFile: 'upstream/modus-vivendi-theme.el',
-    description: 'Elegant, highly legible theme with a black background'
-  }),
-  Object.freeze({
-    id: 'modus-operandi-tinted',
-    name: 'Modus Operandi Tinted',
-    type: ThemeType.LIGHT,
-    sourceFile: 'upstream/modus-operandi-tinted-theme.el',
-    description: 'Light theme with a subtle cream tint (warm appearance)'
-  }),
-  Object.freeze({
-    id: 'modus-vivendi-tinted',
-    name: 'Modus Vivendi Tinted',
-    type: ThemeType.DARK,
-    sourceFile: 'upstream/modus-vivendi-tinted-theme.el',
-    description: 'Dark theme with a subtle blue tint (night sky appearance)'
-  }),
-  Object.freeze({
-    id: 'modus-operandi-deuteranopia',
-    name: 'Modus Operandi Deuteranopia',
-    type: ThemeType.LIGHT,
-    sourceFile: 'upstream/modus-operandi-deuteranopia-theme.el',
-    description: 'Deuteranopia-optimized light theme for red-green color deficiency'
-  }),
-  Object.freeze({
-    id: 'modus-vivendi-deuteranopia',
-    name: 'Modus Vivendi Deuteranopia',
-    type: ThemeType.DARK,
-    sourceFile: 'upstream/modus-vivendi-deuteranopia-theme.el',
-    description: 'Deuteranopia-optimized dark theme for red-green color deficiency'
-  }),
-  Object.freeze({
-    id: 'modus-operandi-tritanopia',
-    name: 'Modus Operandi Tritanopia',
-    type: ThemeType.LIGHT,
-    sourceFile: 'upstream/modus-operandi-tritanopia-theme.el',
-    description: 'Tritanopia-optimized light theme for blue-yellow color deficiency'
-  }),
-  Object.freeze({
-    id: 'modus-vivendi-tritanopia',
-    name: 'Modus Vivendi Tritanopia',
-    type: ThemeType.DARK,
-    sourceFile: 'upstream/modus-vivendi-tritanopia-theme.el',
-    description: 'Tritanopia-optimized dark theme for blue-yellow color deficiency'
-  }),
-]);
-
-/**
- * Custom theme-specific color mappings
- *
- * This provides a way to define colors that vary by theme variant
- * without changing the core color resolution logic.
- *
- * @const
- * @readonly
- */
-const CUSTOM_COLORS: Readonly<Record<string, Readonly<Record<string, string>>>> = Object.freeze({
-  'bg-title-bar-active': Object.freeze({
-    'modus-operandi': 'bg-mode-line-active',
-    'modus-vivendi': 'bg-mode-line-active',
-    'modus-operandi-tinted': 'bg-mode-line-active',
-    'modus-vivendi-tinted': 'bg-mode-line-active',
-    'modus-operandi-deuteranopia': '#c8c8c8',
-    'modus-vivendi-deuteranopia': '#505050',
-    'modus-operandi-tritanopia': '#c8c8c8',
-    'modus-vivendi-tritanopia': '#505050'
-  }),
-});
-
-/**
- * Theme generator implementation
- * @implements IThemeGenerator
- */
-class ThemeGenerator implements IThemeGenerator {
-  private static instance: ThemeGenerator;
-  private readonly logger: ILogger;
-  private readonly parser: IThemeParser;
+class VSCodeThemeFactory implements IThemeFactory {
+  private readonly analyzer: IThemeAnalyzer;
 
   /**
-   * Theme-specific overrides for syntax tokens
-   * @private
-   * @readonly
+   * Construct new theme factory
+   *
+   * @param analyzer - Theme analyzer for color resolution
    */
-  private readonly overrides: Readonly<Record<string, Readonly<Record<string, string>>>> = Object.freeze({
-    // Semantic tokens
-  });
-
-  /**
-   * Create a new ThemeGenerator
-   * @private
-   */
-  private constructor() {
-    this.logger = Logger.getInstance();
-    this.parser = ThemeParser.getInstance();
+  constructor(analyzer: IThemeAnalyzer) {
+    this.analyzer = analyzer;
   }
 
   /**
-   * Get the generator instance (singleton pattern)
-   * @returns ThemeGenerator instance
+   * Synthesize theme from components
+   *
+   * @param theme - Theme definition metadata
+   * @param palette - Color palette for token and editor coloring
+   * @param editorMappings - Editor element color assignments
+   * @param tokenMappings - Token color assignments
+   * @returns Constructed theme
    */
-  public static getInstance(): ThemeGenerator {
-    if (!ThemeGenerator.instance) {
-      ThemeGenerator.instance = new ThemeGenerator();
-    }
-    return ThemeGenerator.instance;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public generateTheme(
+  public synthesizeTheme(
+    theme: IThemeDefinition,
     palette: IColorPalette,
-    definition: IThemeDefinition,
-    config: IExtensionConfiguration
-  ): IVSCodeTheme {
-    try {
-      Validator.required(palette, 'Color palette');
-      Validator.themeDefinition(definition);
-      Validator.required(config, 'Configuration');
+    editorMappings: IEditorMapping[],
+    tokenMappings: ITokenMapping[]
+  ): IThemeVSC {
+    const { id, name, type } = theme;
 
-      const { id, name, type } = definition;
+    const colors = this.createEditorColorMap(editorMappings, palette);
+    const { textMateTokens, semanticTokens } = this.createTokenMappings(tokenMappings, palette);
 
-      const getColor = (colorName: string): string => {
-        const resolvedColor = this.parser.resolveColor(colorName, palette, id);
-        if (!resolvedColor) {
-          throw new ThemeGenerationError(`Missing color: ${colorName} in theme ${id}`);
-        }
-        return resolvedColor;
-      };
-
-      const colors: Record<string, string> = {};
-
-      for (const [vscodeId, modusColors] of Object.entries(EDITOR)) {
-        if (modusColors.length > 0 && modusColors[0] !== '') {
-          colors[vscodeId] = getColor(modusColors[0]);
-        }
+    return {
+      id,
+      name,
+      type,
+      colors,
+      tokens: {
+        textMate: textMateTokens,
+        semantic: semanticTokens
       }
-
-      if (config.experimentalUiColors) {
-        for (const [vscodeId, modusColors] of Object.entries(EDITOR_DEVEL)) {
-          if (modusColors.length > 0 && modusColors[0] !== '') {
-            colors[vscodeId] = getColor(modusColors[0]);
-          }
-        }
-      }
-
-      for (const [vscodeId, themeMapping] of Object.entries(CUSTOM_COLORS)) {
-        if (themeMapping[id]) {
-          const customColor = themeMapping[id];
-          colors[vscodeId] = getColor(customColor);
-        }
-      }
-
-      const tokenColors: ITokenStyle[] = [];
-      this.processTextMateTokens(tokenColors, palette, id, getColor);
-      const semanticTokenColors: Record<string, string | ITokenStyle['settings']> = {};
-      this.processSemanticTokens(semanticTokenColors, palette, id, getColor);
-
-      this.logger.info(`Generated theme: ${name}${config.experimentalUiColors ? ' (with experimental UI colors)' : ''}`);
-
-      return Object.freeze({
-        name,
-        type,
-        colors: Object.freeze(colors),
-        tokenColors: Object.freeze(tokenColors),
-        semanticTokenColors: Object.freeze(semanticTokenColors)
-      });
-    } catch (error) {
-      if (error instanceof ModusThemeError) {
-        throw error;
-      }
-      throw new ThemeGenerationError(
-        `Failed to generate theme: ${error instanceof Error ? error.message : String(error)}`,
-        error instanceof Error ? error : undefined
-      );
-    }
+    };
   }
 
   /**
-   * Process TextMate tokens with theme-specific overrides
-   * @private
-   * @param tokenColors - Token colors array to append to
+   * Create editor color mapping from element definitions
+   *
+   * @param editorMappings - Editor element mappings
    * @param palette - Color palette
-   * @param themeId - Theme identifier
-   * @param getColor - Function to resolve colors
+   * @returns Record of editor element IDs to resolved colors
    */
-  private processTextMateTokens(
-    tokenColors: ITokenStyle[],
-    palette: IColorPalette,
-    themeId: string,
-    getColor: (name: string) => string
-  ): void {
-    const scopesByColor = new Map<string, string[]>();
+  private createEditorColorMap(
+    editorMappings: IEditorMapping[],
+    palette: IColorPalette
+  ): Record<string, string> {
+    const colorMap: Record<string, string> = {};
 
-    for (const [scope, colorNames] of Object.entries(TEXTMATE)) {
-      const overrides = this.overrides[scope];
-      let colorName: string;
-
-      if (overrides && overrides[themeId]) {
-        colorName = overrides[themeId];
-      } else if (colorNames.length > 0 && colorNames[0] !== '') {
-        colorName = colorNames[0];
-      } else {
-        continue;
-      }
-
-      if (!scopesByColor.has(colorName)) {
-        scopesByColor.set(colorName, []);
-      }
-      scopesByColor.get(colorName)!.push(scope);
-    }
-
-    for (const [colorName, scopes] of scopesByColor.entries()) {
-      tokenColors.push({
-        scope: scopes,
-        settings: {
-          foreground: getColor(colorName)
-        }
-      });
-    }
-  }
-
-  /**
-   * Process semantic tokens with theme-specific overrides
-   * @private
-   * @param semanticTokenColors - Semantic token colors record to populate
-   * @param palette - Color palette
-   * @param themeId - Theme identifier
-   * @param getColor - Function to resolve colors
-   */
-  private processSemanticTokens(
-    semanticTokenColors: Record<string, string | ITokenStyle['settings']>,
-    palette: IColorPalette,
-    themeId: string,
-    getColor: (name: string) => string
-  ): void {
-    for (const [token, colorNames] of Object.entries(SEMANTIC)) {
-      const overrides = this.overrides[token];
-      let colorName: string;
-
-      if (overrides && overrides[themeId]) {
-        colorName = overrides[themeId];
-      } else if (colorNames.length > 0 && colorNames[0] !== '') {
-        colorName = colorNames[0];
-      } else {
-        continue;
-      }
-
-      semanticTokenColors[token] = getColor(colorName);
-    }
-  }
-}
-
-/**
- * Theme service implementation
- * @implements IThemeService
- */
-class ThemeService implements IThemeService {
-  private static instance: ThemeService;
-  private readonly logger: ILogger;
-  private readonly parser: IThemeParser;
-  private readonly generator: IThemeGenerator;
-
-  /**
-   * Create a new ThemeService
-   * @private
-   */
-  private constructor() {
-    this.logger = Logger.getInstance();
-    this.parser = ThemeParser.getInstance();
-    this.generator = ThemeGenerator.getInstance();
-  }
-
-  /**
-   * Get the theme service instance (singleton pattern)
-   * @returns ThemeService instance
-   */
-  public static getInstance(): ThemeService {
-    if (!ThemeService.instance) {
-      ThemeService.instance = new ThemeService();
-    }
-    return ThemeService.instance;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public async generateThemes(extensionPath: string, config: IExtensionConfiguration): Promise<void> {
-    try {
-      Validator.notEmpty(extensionPath, 'Extension path');
-      Validator.required(config, 'Configuration');
-
-      const themesDir = path.join(extensionPath, 'themes');
+    for (const mapping of editorMappings) {
       try {
-        await fs.mkdir(themesDir, { recursive: true });
+        if (!mapping.color || mapping.color.trim() === '') {
+          continue;
+        }
+
+        const resolvedColor = this.analyzer.resolveColorReference(mapping.color, palette);
+        if (resolvedColor) {
+          colorMap[mapping.element] = resolvedColor;
+        }
       } catch (error) {
-        throw new FileOperationError(
-          `Failed to create themes directory: ${themesDir}`,
-          error instanceof Error ? error : undefined
-        );
+        console.error(`Error resolving color for editor element "${mapping.element}":`, error);
       }
+    }
+
+    return colorMap;
+  }
+
+  /**
+   * Create token mappings organized by token system
+   *
+   * @param tokenMappings - Token mappings
+   * @param palette - Color palette
+   * @returns Object containing TextMate and semantic tokens
+   */
+  private createTokenMappings(
+    tokenMappings: ITokenMapping[],
+    palette: IColorPalette
+  ): { textMateTokens: ITextMateToken[], semanticTokens: ISemanticToken[] } {
+    const textMateTokens: ITextMateToken[] = [];
+    const semanticTokens: ISemanticToken[] = [];
+
+    for (const mapping of tokenMappings) {
+      try {
+        if (!mapping.color || mapping.color.trim() === '') {
+          continue;
+        }
+
+        const resolvedColor = this.analyzer.resolveColorReference(mapping.color, palette);
+        if (resolvedColor) {
+          // NOTE: Previously, we used the isSemantic property to determine
+          // whether a token should be applied to semanticTokenColors. This
+          // proved unreliable—VS Code's behavior is inconsistent across
+          // languages. Some languages use only TextMate tokens, others use
+          // semantic tokens, and many use a combination that can vary by
+          // context.
+          //
+          semanticTokens.push(this.createSemanticToken(mapping.scopeOrType, resolvedColor));
+          textMateTokens.push(this.createTextMateToken(mapping.scopeOrType, resolvedColor));
+        }
+      } catch (error) {
+        console.error(`Error resolving color for token "${mapping.scopeOrType}":`, error);
+      }
+    }
+
+    return { textMateTokens, semanticTokens };
+  }
+
+  /**
+   * Create semantic token from scope and color
+   *
+   * @param scope - Semantic token scope
+   * @param color - Resolved color value
+   * @returns Semantic token object
+   */
+  private createSemanticToken(scope: string, color: string): ISemanticToken {
+    return {
+      type: scope,
+      style: color
+    };
+  }
+
+  /**
+   * Create TextMate token from scope and color
+   *
+   * @param scope - TextMate token scope
+   * @param color - Resolved color value
+   * @returns TextMate token object
+   */
+  private createTextMateToken(scope: string, color: string): ITextMateToken {
+    return {
+      scope: [scope],
+      style: {
+        foreground: color
+      }
+    };
+  }
+}
+
+/**
+ * Theme serialization implementation
+ */
+class VSCodeThemeSerializer implements IThemeSerializer {
+  /**
+   * Serialize a theme to VS Code's format specification
+   *
+   * @param theme - Internal theme representation
+   * @returns VS Code compatible theme object
+   */
+  public serialize(theme: IThemeVSC): any {
+    return {
+      name: theme.name,
+      type: theme.type,
+      colors: theme.colors,
+
+      tokenColors: theme.tokens.textMate.map(token => ({
+        scope: token.scope,
+        settings: typeof token.style === 'string'
+          ? { foreground: token.style }
+          : token.style
+      })),
+
+      semanticTokenColors: Object.fromEntries(
+        theme.tokens.semantic.map(token => [
+          token.type,
+          token.style
+        ])
+      )
+    };
+  }
+}
+
+/**
+ * Hierarchical configuration processing
+ */
+abstract class HierarchicalConfigurationProcessor<T> {
+  /**
+   * Process a hierarchical configuration object recursively
+   *
+   * @param path - Current path in the configuration hierarchy
+   * @param node - Current node being processed
+   * @returns Array of processed configuration elements
+   */
+  public processConfiguration(path: string, node: unknown): T[] {
+    const elements: T[] = [];
+    this.traverseConfigurationNode(path, node, elements);
+    return elements;
+  }
+
+  /**
+   * Traverse node in the configuration hierarchy
+   *
+   * Recursively processes the configuration tree, creating path-based
+   * identifiers for terminal values.
+   *
+   * @param path - Current path in the configuration hierarchy
+   * @param node - Current node being processed
+   * @param accumulator - Result collection for processed elements
+   */
+  protected traverseConfigurationNode(
+    path: string,
+    node: unknown,
+    accumulator: T[]
+  ): void {
+    if (typeof node === 'string') {
+      const element = this.createElementFromLeaf(path, node);
+      accumulator.push(element);
+    } else if (typeof node === 'object' && node !== null) {
+      this.traverseObjectProperties(path, node as Record<string, unknown>, accumulator);
+    }
+  }
+
+  /**
+   * Traverse properties of an object node
+   *
+   * @param path - Current path in the configuration hierarchy
+   * @param obj - Object whose properties should be traversed
+   * @param accumulator - Result collection for processed elements
+   */
+  protected traverseObjectProperties(
+    path: string,
+    obj: Record<string, unknown>,
+    accumulator: T[]
+  ): void {
+    for (const [key, value] of Object.entries(obj)) {
+      const qualifiedPath = this.constructQualifiedPath(path, key);
+      this.traverseConfigurationNode(qualifiedPath, value, accumulator);
+    }
+  }
+
+  /**
+   * Construct qualified path by joining path segments
+   *
+   * @param currentPath - Current path in the hierarchy
+   * @param segment - New path segment to append
+   * @returns Qualified path with proper delimiter
+   */
+  protected constructQualifiedPath(currentPath: string, segment: string): string {
+    return currentPath ? `${currentPath}.${segment}` : segment;
+  }
+
+  /**
+   * Create domain element from leaf node value
+   *
+   * @param path - Path to the leaf node
+   * @param value - Value of the leaf node
+   * @returns Domain-specific element
+   */
+  protected abstract createElementFromLeaf(path: string, value: string): T;
+}
+
+/**
+ * Editor mapping processor implementation
+ *
+ * Specialized hierarchical processor for editor color mappings.
+ */
+class EditorMappingProcessor extends HierarchicalConfigurationProcessor<IEditorMapping> {
+  /**
+   * Create editor mapping from leaf node
+   *
+   * @param element - Editor element identifier
+   * @param color - Color reference value
+   * @returns Editor mapping object
+   */
+  protected createElementFromLeaf(element: string, color: string): IEditorMapping {
+    return { element, color };
+  }
+}
+
+/**
+ * Token mapping processor implementation
+ *
+ * Specialized hierarchical processor for token color mappings.
+ */
+class TokenMappingProcessor extends HierarchicalConfigurationProcessor<ITokenMapping> {
+  /**
+   * Create token mapping from leaf node
+   *
+   * @param scopeOrType - Token scope or type identifier
+   * @param color - Color reference value
+   * @returns Token mapping object with semantic classification
+   */
+  protected createElementFromLeaf(scopeOrType: string, color: string): ITokenMapping {
+    return {
+      scopeOrType,
+      color,
+    };
+  }
+}
+
+/**
+ * Theme orchestration service implementation
+ */
+class ThemeOrchestrationService implements IThemeOrchestrator {
+  private readonly analyzer: IThemeAnalyzer;
+  private readonly factory: IThemeFactory;
+  private readonly serializer: IThemeSerializer;
+  private readonly configurationFiles: ReadonlyArray<string>;
+  private readonly editorProcessor: EditorMappingProcessor;
+  private readonly tokenProcessor: TokenMappingProcessor;
+  private lastGenerationTimestamp = 0;
+
+  /**
+   * Construct a new theme orchestration service
+   */
+  constructor(
+    analyzer: IThemeAnalyzer,
+    factory: IThemeFactory,
+    serializer: IThemeSerializer
+  ) {
+    this.analyzer = analyzer;
+    this.factory = factory;
+    this.serializer = serializer;
+    this.configurationFiles = Object.freeze([
+      'modus-palette.json',
+      'modus-editor.json',
+      'modus-editor-experimental.json',
+      'modus-tokens.json',
+      'modus-themes.json'
+    ]);
+    this.editorProcessor = new EditorMappingProcessor();
+    this.tokenProcessor = new TokenMappingProcessor();
+  }
+
+  /**
+   * Detect modifications to source files
+   *
+   * @param extensionPath - Path to the extension root
+   * @returns Promise resolving to true if changes detected
+   */
+  public async detectSourceModifications(extensionPath: string): Promise<boolean> {
+    try {
+      const configDir = path.join(extensionPath, 'config');
+      const filePaths = this.getConfigurationFilePaths(configDir);
+      const fileStats = await this.collectFileStatistics(filePaths);
+      const latestModification = this.determineLatestModificationTime(fileStats);
+
+      return latestModification > this.lastGenerationTimestamp;
+    } catch (error) {
+      console.error('Error detecting file modifications:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get paths to all relevant configuration files
+   *
+   * @param configDir - Configuration directory
+   * @returns Array of file paths to monitor
+   */
+  private getConfigurationFilePaths(configDir: string): string[] {
+    if (!configDir) {
+      throw new Error('Configuration directory path is undefined');
+    }
+
+    return this.configurationFiles.map(filename =>
+      path.join(configDir, filename)
+    );
+  }
+
+  /**
+   * Collect file statistics for the specified files
+   *
+   * @param filePaths - Paths to analyze
+   * @returns Array of file statistics objects or null for missing files
+   */
+  private async collectFileStatistics(filePaths: string[]): Promise<(Stats | null)[]> {
+    return Promise.all(
+      filePaths.map(filePath =>
+        fs.stat(filePath).catch(error => {
+          console.warn(`Failed to stat file ${filePath}:`, error);
+          return null;
+        })
+      )
+    );
+  }
+
+  /**
+   * Determine the latest modification time among the specified files
+   *
+   * @param fileStats - Array of file statistics objects
+   * @returns Latest modification time in milliseconds
+   */
+  private determineLatestModificationTime(fileStats: (Stats | null)[]): number {
+    let latestModification = 0;
+    for (const stat of fileStats) {
+      if (stat && stat.mtime) {
+        const modificationTime = stat.mtime.getTime();
+        if (modificationTime > latestModification) {
+          latestModification = modificationTime;
+        }
+      }
+    }
+    return latestModification;
+  }
+
+  /**
+   * Generate all themes from source definitions
+   *
+   * @param extensionPath - Path to the extension root
+   * @param config - User configuration
+   * @returns Promise that resolves when generation completes
+   */
+  public async generateAllThemes(extensionPath: string, config: IConfiguration): Promise<void> {
+    try {
+      const themesDir = path.join(extensionPath, 'themes');
+      await fs.mkdir(themesDir, { recursive: true });
+      const configDir = path.join(extensionPath, 'config');
+
+      const definitionsPath = path.join(configDir, 'modus-themes.json');
+      const definitionsContent = await fs.readFile(definitionsPath, 'utf8');
+      const themeDefinitions = JSON.parse(definitionsContent) as IThemeDefinition[];
+
+      const editorPath = path.join(configDir, 'modus-editor.json');
+      const editorContent = await fs.readFile(editorPath, 'utf8');
+      const editorData = JSON.parse(this.stripJsonComments(editorContent));
+      const editorMappings = this.editorProcessor.processConfiguration('', editorData);
+
+      let experimentalEditorMappings: IEditorMapping[] = [];
+      if (config.experimental) {
+        try {
+          const experimentalEditorPath = path.join(configDir, 'modus-editor-experimental.json');
+          const experimentalContent = await fs.readFile(experimentalEditorPath, 'utf8');
+          const experimentalData = JSON.parse(this.stripJsonComments(experimentalContent));
+          experimentalEditorMappings = this.editorProcessor.processConfiguration('', experimentalData);
+        } catch (error) {
+          console.warn('Failed to load experimental editor mappings:', error);
+        }
+      }
+
+      const combinedEditorMappings = [...editorMappings];
+      if (config.experimental && experimentalEditorMappings.length > 0) {
+        combinedEditorMappings.push(...experimentalEditorMappings);
+      }
+
+      const tokensPath = path.join(configDir, 'modus-tokens.json');
+      const tokensContent = await fs.readFile(tokensPath, 'utf8');
+      const tokensData = JSON.parse(this.stripJsonComments(tokensContent));
+      const tokenMappings = this.tokenProcessor.processConfiguration('', tokensData);
+
+      const extensionsPath = path.join(configDir, 'modus-palette.json');
+      const extensions = await this.analyzer.loadExtensions(extensionsPath);
 
       const results = await Promise.allSettled(
-        THEME_DEFINITIONS.map(async (themeDef) => {
+        themeDefinitions.map(async (theme) => {
           try {
-            const sourcePath = path.join(extensionPath, themeDef.sourceFile);
-            const outputPath = path.join(themesDir, `${themeDef.id}-color-theme.json`);
+            const sourcePath = path.join(extensionPath, theme.source);
+            const outputPath = path.join(themesDir, `${theme.id}-color-theme.json`);
 
-            this.logger.debug(`Parsing theme file: ${sourcePath}`);
-            const palette = await this.parser.parseThemeFile(sourcePath);
+            const basePalette = await this.analyzer.analyzeSource(sourcePath);
 
-            this.logger.debug(`Applying overrides to theme: ${themeDef.id}`);
-            const finalPalette = this.parser.applyOverrides(palette, config.colorOverrides);
+            const palette = this.analyzer.mergeColorSources(
+              basePalette,
+              extensions,
+              config.colorOverrides,
+              theme.id
+            );
 
-            this.logger.debug(`Generating theme: ${themeDef.id}`);
-            const theme = this.generator.generateTheme(finalPalette, themeDef, config);
+            const vscodeTheme = this.factory.synthesizeTheme(
+              theme,
+              palette,
+              combinedEditorMappings,
+              tokenMappings
+            );
 
-            this.logger.debug(`Writing theme file: ${outputPath}`);
-            await fs.writeFile(outputPath, JSON.stringify(theme, null, 2));
+            const exportedTheme = this.serializer.serialize(vscodeTheme);
 
-            this.logger.info(`Generated theme file: ${themeDef.name}`);
-            return themeDef.id;
+            await fs.writeFile(outputPath, JSON.stringify(exportedTheme, null, 2));
+
+            return theme.id;
           } catch (error) {
-            this.logger.error(`Failed to generate theme ${themeDef.id}`, error);
+            console.error(`Failed to generate theme ${theme.id}`, error);
             throw error;
           }
         })
       );
 
-      const succeeded = results.filter(r => r.status === 'fulfilled').length;
-      const failed = results.filter(r => r.status === 'rejected').length;
+      this.lastGenerationTimestamp = Date.now();
 
-      this.logger.info(`Theme generation complete: ${succeeded} succeeded, ${failed} failed`);
-
-      if (failed > 0) {
-        throw new ThemeGenerationError(`Failed to generate ${failed} theme(s)`);
+      const failedCount = results.filter(r => r.status === 'rejected').length;
+      if (failedCount > 0) {
+        throw new ThemeProcessingError(
+          `Failed to generate ${failedCount} theme(s)`,
+          'GENERATION_ERROR'
+        );
       }
     } catch (error) {
-      if (error instanceof ModusThemeError) {
-        throw error;
-      }
-      throw new ThemeGenerationError(
-        `Failed to generate themes: ${error instanceof Error ? error.message : String(error)}`,
+      throw new ThemeProcessingError(
+        `Theme generation process failed: ${error instanceof Error ? error.message : String(error)}`,
+        'ORCHESTRATION_ERROR',
         error instanceof Error ? error : undefined
       );
     }
   }
+
+  /**
+   * Strip C-style comments from JSON string
+   *
+   */
+  private stripJsonComments(jsonString: string): string {
+    // Remove single line comments (// comment)
+    let result = jsonString.replace(/\/\/.*$/gm, '');
+
+    // Remove multi-line comments (/* comment */)
+    result = result.replace(/\/\*[\s\S]*?\*\//g, '');
+
+    return result;
+  }
 }
 
 /**
- * Main extension class
+ * Extension controller
  */
 class ModusThemesExtension {
   private readonly context: vscode.ExtensionContext;
-  private readonly logger: ILogger;
-  private readonly configService: IConfigurationService;
-  private readonly themeService: IThemeService;
+  private readonly configRepository: IConfigurationRepository;
+  private readonly themeOrchestrator: IThemeOrchestrator;
+  private readonly fileWatcher: IFileWatcher;
   private readonly disposables: vscode.Disposable[] = [];
 
   /**
-   * Create a new ModusThemesExtension
-   * @param context - Extension context
+   * Construct new extension controller
+   *
+   * @param context - extension context
    */
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
-    this.logger = Logger.getInstance();
-    this.configService = ConfigurationService.getInstance();
-    this.themeService = ThemeService.getInstance();
+
+    const analyzer = new ModusThemeAnalyzer();
+    this.configRepository = new ConfigurationRepository();
+    this.fileWatcher = new FileSystemWatcher();
+
+    const factory = new VSCodeThemeFactory(analyzer);
+    const serializer = new VSCodeThemeSerializer();
+    this.themeOrchestrator = new ThemeOrchestrationService(analyzer, factory, serializer);
   }
 
   /**
    * Activate the extension
-   * @returns Promise resolving when activation is complete
+   *
+   * Initializes the extension and sets up event handlers.
    */
   public async activate(): Promise<void> {
     try {
-      this.logger.info('Modus Themes extension activating');
+      console.log('Modus Themes extension activating');
 
-      const config = this.configService.getConfiguration();
-
-      (this.logger as Logger).setDebugMode(config.debugMode);
-
-      this.logger.debug('Generating initial themes');
-      await this.themeService.generateThemes(this.context.extensionPath, config);
+      const config = this.configRepository.retrieveConfiguration();
+      await this.themeOrchestrator.generateAllThemes(this.context.extensionPath, config);
 
       this.disposables.push(
-        this.configService.onConfigurationChanged(async (newConfig) => {
+        this.configRepository.onConfigurationChanged(async (newConfig) => {
           try {
-            (this.logger as Logger).setDebugMode(newConfig.debugMode);
+            await this.themeOrchestrator.generateAllThemes(this.context.extensionPath, newConfig);
 
-            this.logger.debug('Configuration changed, regenerating themes');
-            await this.themeService.generateThemes(this.context.extensionPath, newConfig);
-
-            vscode.window.showInformationMessage(
-              'Modus Themes: Theme files have been updated. Reload window to apply changes.',
-              'Reload Window'
-            ).then(selection => {
-              if (selection === 'Reload Window') {
-                vscode.commands.executeCommand('workbench.action.reloadWindow');
-              }
-            });
+            this.promptForReload('Theme files have been updated');
           } catch (error) {
-            this.logger.error('Failed to update themes after configuration change', error);
             vscode.window.showErrorMessage(
-              'Modus Themes: Failed to update theme files. Check the output panel for details.'
+              'Modus Themes: Failed to update theme files.'
             );
-            this.logger.show();
           }
         })
       );
 
+      const configDir = path.join(this.context.extensionPath, 'config');
       this.disposables.push(
-        vscode.commands.registerCommand('modus.reloadWindow', () => {
-          vscode.commands.executeCommand('workbench.action.reloadWindow');
+        this.fileWatcher.watchDir(configDir, async () => {
+          try {
+            const hasChanges = await this.themeOrchestrator.detectSourceModifications(this.context.extensionPath);
+
+            if (hasChanges) {
+              const config = this.configRepository.retrieveConfiguration();
+              await this.themeOrchestrator.generateAllThemes(this.context.extensionPath, config);
+              // this.promptForReload('Theme files have been updated due to configuration changes');
+            }
+          } catch (error) {
+            console.error('Failed to update themes after file changes', error);
+          }
         })
       );
 
-      this.logger.info('Modus Themes extension successfully activated');
+      this.registerCommands();
+
+      console.log('Modus Themes extension successfully activated');
     } catch (error) {
-      this.logger.error('Failed to activate Modus Themes extension', error);
       vscode.window.showErrorMessage(
-        'Failed to activate Modus Themes extension. Check the output panel for details.'
+        'Failed to activate Modus Themes extension.'
       );
-      this.logger.show();
       throw error;
     }
   }
 
   /**
+   * Register extension commands
+   */
+  private registerCommands(): void {
+    this.disposables.push(
+      vscode.commands.registerCommand('modus.reloadWindow', () => {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+      })
+    );
+
+    this.disposables.push(
+      vscode.commands.registerCommand('modus.regenerateThemes', async () => {
+        try {
+          const config = this.configRepository.retrieveConfiguration();
+          await this.themeOrchestrator.generateAllThemes(this.context.extensionPath, config);
+
+          this.promptForReload('Theme files have been regenerated');
+        } catch (error) {
+          vscode.window.showErrorMessage(
+            'Modus Themes: Failed to regenerate theme files.'
+          );
+        }
+      })
+    );
+  }
+
+  /**
+   * Show reload prompt to user
+   *
+   * @param message - Message to display in the prompt
+   */
+  private promptForReload(message: string): void {
+    vscode.window.showInformationMessage(
+      `Modus Themes: ${message}. Reload window to apply changes.`,
+      'Reload Window'
+    ).then(selection => {
+      if (selection === 'Reload Window') {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+      }
+    });
+  }
+
+  /**
    * Deactivate the extension
+   *
+   * Cleans up resources when the extension is deactivated.
    */
   public deactivate(): void {
-    this.logger.info('Modus Themes extension deactivating');
-
     for (const disposable of this.disposables) {
       disposable.dispose();
     }
-
-    this.logger.info('Modus Themes extension deactivated');
   }
 }
 
 /**
- * Extension activation function called by VS Code
- * @param context - Extension context
+ * Extension activation function
+ *
+ * @param context - VS Code extension context
  */
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const extension = new ModusThemesExtension(context);
@@ -1600,8 +1203,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 /**
- * Extension deactivation function called by VS Code
+ * Extension deactivation function
  */
 export function deactivate(): void {
-  // Extension cleanup will be handled by the ModusThemesExtension class
+  // Extension cleanup handled by ModusThemesExtension instance
 }

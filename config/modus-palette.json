@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "modus-operandi": {
+      "bg-title-bar-active": "bg-mode-line-active"
+    },
+    "modus-vivendi": {
+      "bg-title-bar-active": "bg-mode-line-active"
+    },
+    "modus-operandi-tinted": {
+      "bg-title-bar-active": "bg-mode-line-active"
+    },
+    "modus-vivendi-tinted": {
+      "bg-title-bar-active": "bg-mode-line-active"
+    },
+    "modus-operandi-deuteranopia": {
+      "bg-title-bar-active": "#c8c8c8"
+    },
+    "modus-vivendi-deuteranopia": {
+      "bg-title-bar-active": "#505050"
+    },
+    "modus-operandi-tritanopia": {
+      "bg-title-bar-active": "#c8c8c8"
+    },
+    "modus-vivendi-tritanopia": {
+      "bg-title-bar-active": "#505050"
+    }
+  }
+}

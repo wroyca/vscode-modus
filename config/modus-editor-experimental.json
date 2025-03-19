@@ -1,0 +1,167 @@
+{
+  // Text colors
+  //
+
+  // Action colors
+  //
+
+  // Button control
+  //
+
+  // Dropdown control
+  //
+
+  // Input control
+  //
+  "input.background": "bg-dim",
+
+  // Scrollbar control
+  //
+
+  // Badge
+  //
+
+  // Progress bar
+  //
+
+  // Lists and trees
+  //
+
+  // Activity Bar
+  //
+  "activityBar.background": "bg-dim",
+  "activityBar.foreground": "fg-main",
+  "activityBar.inactiveForeground": "fg-dim",
+
+  // Profiles
+  //
+
+  // Side Bar
+  //
+  "sideBar.background": "bg-tab-bar",
+
+  // Minimap
+  //
+
+  // Editor Groups & Tabs
+  //
+  "editorGroupHeader.tabsBackground": "bg-tab-bar",
+
+  // Editor colors
+  //
+
+  // Diff editor colors
+  //
+
+  // Chat colors
+  //
+
+  // Inline Chat colors
+  //
+
+  // Panel Chat colors
+  //
+
+  // Editor widget colors
+  //
+  "editorWidget.background": "bg-tab-bar",
+
+  // Peek view colors
+  //
+
+  // Merge conflicts colors
+  //
+
+  // Panel colors
+  //
+
+  // Status Bar colors
+  //
+
+  // Title Bar colors
+  //
+  "titleBar.activeBackground": "bg-title-bar-active",
+
+  // Menu Bar colors
+  //
+
+  // Command Center colors
+  //
+  "commandCenter.background": "bg-dim",
+  "commandCenter.border": "border"
+
+  // Notification colors
+  //
+
+  // Banner colors
+  //
+
+  // Extensions colors
+  //
+
+  // Quick picker colors
+  //
+
+  // Keybinding label colors
+  //
+
+  // Keyboard shortcut table colors
+  //
+
+  // Integrated Terminal colors
+  //
+
+  // Debug colors
+  //
+
+  // Testing colors
+  //
+
+  // Welcome page colors
+  //
+
+  // Git colors
+  //
+
+  // Source Control Graph colors
+  //
+
+  // Settings Editor colors
+  //
+
+  // Breadcrumbs colors
+  //
+
+  // Snippets colors
+  //
+
+  // Symbol Icons colors
+  //
+
+  // Debug Icons colors
+  //
+
+  // Notebook colors
+  //
+
+  // Chart colors
+  //
+
+  // Ports colors
+  //
+
+  // Comments View colors
+  //
+
+  // Action Bar colors
+  //
+
+  // Simple Find Widget colors
+  //
+
+  // Gauge colors
+  //
+
+  // Extension colors
+  //
+}
