@@ -43,8 +43,19 @@
 
   // Editor colors
   //
-  "editor.background": "bg-main",
-  "editor.foreground": "fg-main"
+  "editor.background"                                     : "bg-main",
+  "editor.foreground"                                     : "fg-main",
+  "editorLineNumber.foreground"                           : "fg-line-number-inactive",
+  "editorLineNumber.activeForeground"                     : "fg-line-number-active",
+
+  // The gutter contains the glyph margins and the line numbers:
+
+  "editorGutter.modifiedBackground"                       : "bg-changed-fringe",
+  "editorGutter.modifiedSecondaryBackground"              : "bg-changed-refine",
+  "editorGutter.addedBackground"                          : "bg-added-fringe",
+  "editorGutter.addedSecondaryBackground"                 : "bg-added-refine",
+  "editorGutter.deletedBackground"                        : "bg-removed-fringe",
+  "editorGutter.deletedSecondaryBackground"               : "bg-removed-refine",
 
   // Diff editor colors
   //
@@ -66,6 +77,31 @@
 
   // Merge conflicts colors
   //
+  "editorOverviewRuler.commentForeground"                 : "bg-added-refine",
+  "editorOverviewRuler.commentUnresolvedForeground"       : "bg-removed-refine",
+  "editorOverviewRuler.commonContentForeground"           : "bg-changed-fringe",
+  "editorOverviewRuler.currentContentForeground"          : "bg-added-fringe",
+  "editorOverviewRuler.incomingContentForeground"         : "bg-removed-fringe",
+  "merge.border"                                          : "bg-diff-context",
+  "merge.commonContentBackground"                         : "bg-changed-faint@0.8",
+  "merge.commonHeaderBackground"                          : "bg-changed@0.8",
+  "merge.currentContentBackground"                        : "bg-added-faint@0.8",
+  "merge.currentHeaderBackground"                         : "bg-added@0.8",
+  "merge.incomingContentBackground"                       : "bg-removed-faint@0.8",
+  "merge.incomingHeaderBackground"                        : "bg-removed@0.8",
+  "mergeEditor.change.background"                         : "bg-changed-refine",
+  "mergeEditor.change.word.background"                    : "bg-changed",
+  "mergeEditor.changeBase.background"                     : "bg-changed-faint",
+  "mergeEditor.changeBase.word.background"                : "bg-changed",
+  "mergeEditor.conflict.handled.minimapOverViewRuler"     : "bg-added-fringe",
+  "mergeEditor.conflict.handledFocused.border"            : "fg-added-intense",
+  "mergeEditor.conflict.handledUnfocused.border"          : "bg-added-fringe",
+  "mergeEditor.conflict.input1.background"                : "bg-added-faint",
+  "mergeEditor.conflict.input2.background"                : "bg-removed-faint",
+  "mergeEditor.conflict.unhandled.minimapOverViewRuler"   : "bg-removed-fringe",
+  "mergeEditor.conflict.unhandledFocused.border"          : "fg-removed-intense",
+  "mergeEditor.conflict.unhandledUnfocused.border"        : "bg-removed-fringe",
+  "mergeEditor.conflictingLines.background"               : "bg-diff-context",
 
   // Panel colors
   //
@@ -114,9 +150,33 @@
 
   // Git colors
   //
+  "gitDecoration.addedResourceForeground"                 : "fg-added",
+  "gitDecoration.modifiedResourceForeground"              : "fg-changed",
+  "gitDecoration.deletedResourceForeground"               : "fg-removed",
+  "gitDecoration.renamedResourceForeground"               : "fg-added-intense",
+  "gitDecoration.stageModifiedResourceForeground"         : "fg-changed-intense",
+  "gitDecoration.stageDeletedResourceForeground"          : "fg-removed-intense",
+  "gitDecoration.untrackedResourceForeground"             : "fg-alt",
+  "gitDecoration.ignoredResourceForeground"               : "fg-dim",
+  "gitDecoration.conflictingResourceForeground"           : "bg-removed-fringe",
+  "gitDecoration.submoduleResourceForeground"             : "bg-changed-fringe",
+  "git.blame.editorDecorationForeground"                  : "fg-changed",
 
   // Source Control Graph colors
   //
+  "scmGraph.historyItemHoverLabelForeground"              : "fg-main",
+  "scmGraph.foreground1"                                  : "rainbow-1",
+  "scmGraph.foreground2"                                  : "rainbow-2",
+  "scmGraph.foreground3"                                  : "rainbow-3",
+  "scmGraph.foreground4"                                  : "rainbow-4",
+  "scmGraph.foreground5"                                  : "rainbow-5",
+  "scmGraph.historyItemHoverAdditionsForeground"          : "fg-added-intense",
+  "scmGraph.historyItemHoverDeletionsForeground"          : "fg-removed-intense",
+  "scmGraph.historyItemRefColor"                          : "accent-0",
+  "scmGraph.historyItemRemoteRefColor"                    : "accent-1",
+  "scmGraph.historyItemBaseRefColor"                      : "accent-3",
+  "scmGraph.historyItemHoverDefaultLabelForeground"       : "fg-dim",
+  "scmGraph.historyItemHoverDefaultLabelBackground"       : "bg-diff-context"
 
   // Settings Editor colors
   //
