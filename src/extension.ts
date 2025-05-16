@@ -52,6 +52,21 @@ interface IColor {
 }
 
 /**
+ * Color transformation service
+ */
+interface IColorTransformer {
+  /**
+   * Apply opacity to a hex color
+   *
+   * @param hex - Hex color string (with or without # prefix)
+   * @param opacity - Opacity value between 0 and 1
+   * @returns Hex color with alpha channel (#RRGGBBAA)
+   * @throws {ThemeProcessingError} If the hex color format is invalid
+   */
+  applyOpacity(hex: string, opacity: number): string;
+}
+
+/**
  * Extended color palette with theme-specific variant support
  */
 interface IColorPalette extends IColor {
@@ -174,6 +189,50 @@ interface IConfigurationRepository {
    * @returns Disposable resource for managing the subscription lifecycle
    */
   onConfigurationChanged(handler: (config: IConfiguration) => void): Disposable;
+}
+
+/**
+ * Color resolution service
+ */
+interface IColorResolver {
+  /**
+   * Resolve a color reference with opacity notation
+   *
+   * @param reference - Color reference with opacity (format: "color-name@opacity")
+   * @param palette - Color palette to resolve against
+   * @returns Resolved hex color with opacity applied
+   * @throws {ThemeProcessingError} If the reference is invalid or cannot be resolved
+   */
+  resolveColorWithOpacity(reference: string, palette: IColorPalette): string;
+
+  /**
+   * Parse and validate an opacity value
+   *
+   * @param opacityStr - String representation of opacity value
+   * @param fullReference - Full color reference for error context
+   * @returns Validated opacity value between 0 and 1
+   * @throws {ThemeProcessingError} If opacity value is invalid
+   */
+  parseAndValidateOpacity(opacityStr: string, fullReference: string): number;
+
+  /**
+   * Resolve a base color name to its hex value
+   *
+   * @param baseColorName - Base color name (without opacity suffix)
+   * @param palette - Color palette to resolve against
+   * @returns Resolved hex color
+   * @throws {ThemeProcessingError} If base color cannot be resolved
+   */
+  resolveBaseColor(baseColorName: string, palette: IColorPalette): string;
+
+  /**
+   * Find and resolve a color from theme variants
+   *
+   * @param colorName - Color name to find
+   * @param palette - Color palette containing variants
+   * @returns Resolved color or undefined if not found
+   */
+  findAndResolveVariantColor(colorName: string, palette: IColorPalette): string | undefined;
 }
 
 /**
@@ -303,6 +362,51 @@ class ThemeProcessingError extends Error {
 }
 
 /**
+ * Standard implementation of color transformation service
+ */
+class StandardColorTransformer implements IColorTransformer {
+  /**
+   * Apply opacity to a hex color
+   *
+   * @param hex - Hex color string (with or without # prefix)
+   * @param opacity - Opacity value between 0 and 1
+   * @returns Hex color with alpha channel (#RRGGBBAA)
+   * @throws {ThemeProcessingError} If the hex color format is invalid
+   */
+  public applyOpacity(hex: string, opacity: number): string {
+    //
+    if (!hex) {
+      throw new ThemeProcessingError(
+        'Invalid hex color: empty or undefined',
+        'COLOR_FORMAT_ERROR'
+      );
+    }
+
+    if (!hex.startsWith('#')) {
+      hex = `#${hex}`;
+    }
+
+    const hexWithoutPrefix = hex.replace('#', '');
+
+    // 8-digit RGBA formats (with alpha channel) are intentionally rejected to
+    // prevent ambiguity when appending our calculated alpha value.
+    //
+    if (!/^[0-9A-Fa-f]{6}$/.test(hexWithoutPrefix)) {
+      throw new ThemeProcessingError(
+        `Invalid hex color format: ${hex}`,
+        'COLOR_FORMAT_ERROR'
+      );
+    }
+
+    const alpha = Math.round(opacity * 255)
+      .toString(16)
+      .padStart(2, '0');
+
+    return `#${hexWithoutPrefix}${alpha}`;
+  }
+}
+
+/**
  * File system observer implementation
  */
 class FileSystemWatcher implements IFileWatcher {
@@ -387,9 +491,148 @@ class ConfigurationRepository implements IConfigurationRepository {
 }
 
 /**
+ * Standard implementation of color resolution service
+ */
+class StandardColorResolver implements IColorResolver {
+  private readonly transformer: IColorTransformer;
+  private readonly colorReferenceResolver: (name: string, palette: IColorPalette) => string | undefined;
+
+  /**
+   * Construct a new color resolver
+   *
+   * @param transformer - Color transformation service
+   * @param colorReferenceResolver - Function to resolve color references
+   */
+  constructor(
+    transformer: IColorTransformer,
+    colorReferenceResolver: (name: string, palette: IColorPalette) => string | undefined
+  ) {
+    this.transformer = transformer;
+    this.colorReferenceResolver = colorReferenceResolver;
+  }
+
+  /**
+   * Resolve a color reference with opacity notation
+   *
+   * @param reference - Color reference with opacity (format: "color-name@opacity")
+   * @param palette - Color palette to resolve against
+   * @returns Resolved hex color with opacity applied
+   * @throws {ThemeProcessingError} If the reference is invalid or cannot be resolved
+   */
+  public resolveColorWithOpacity(reference: string, palette: IColorPalette): string {
+    const [baseColorName, opacityStr] = reference.split('@');
+    const opacity = this.parseAndValidateOpacity(opacityStr, reference);
+    const baseColor = this.resolveBaseColor(baseColorName, palette);
+
+    return this.transformer.applyOpacity(baseColor, opacity);
+  }
+
+  /**
+   * Parse and validate an opacity value
+   *
+   * @param opacityStr - String representation of opacity value
+   * @param fullReference - Full color reference for error context
+   * @returns Validated opacity value between 0 and 1
+   * @throws {ThemeProcessingError} If opacity value is invalid
+   */
+  public parseAndValidateOpacity(opacityStr: string, fullReference: string): number {
+    const opacity = parseFloat(opacityStr);
+
+    if (isNaN(opacity) || opacity < 0 || opacity > 1) {
+      throw new ThemeProcessingError(
+        `Invalid opacity value: "${opacityStr}" in "${fullReference}"`,
+        'COLOR_OPACITY_ERROR'
+      );
+    }
+
+    return opacity;
+  }
+
+  /**
+   * Resolve a base color name to its hex value
+   *
+   * @param baseColorName - Base color name (without opacity suffix)
+   * @param palette - Color palette to resolve against
+   * @returns Resolved hex color
+   * @throws {ThemeProcessingError} If base color cannot be resolved
+   */
+  public resolveBaseColor(baseColorName: string, palette: IColorPalette): string {
+    let baseColorHex: string | undefined;
+
+    if (baseColorName.startsWith('#')) {
+      baseColorHex = baseColorName;
+    }
+    else if (palette.hex[baseColorName]) {
+      baseColorHex = palette.hex[baseColorName];
+    }
+    else if (palette.semantic[baseColorName]) {
+      try {
+        baseColorHex = this.colorReferenceResolver(baseColorName, palette);
+      } catch (error) {
+        throw new ThemeProcessingError(
+          `Cannot apply opacity to "${baseColorName}": color not found in palette`,
+          'COLOR_REFERENCE_ERROR'
+        );
+      }
+    }
+    else if (palette.variants) {
+      baseColorHex = this.findAndResolveVariantColor(baseColorName, palette);
+    }
+
+    if (!baseColorHex) {
+      throw new ThemeProcessingError(
+        `Cannot apply opacity to "${baseColorName}": color not found in palette`,
+        'COLOR_REFERENCE_ERROR'
+      );
+    }
+
+    return baseColorHex;
+  }
+
+  /**
+   * Find and resolve a color from theme variants
+   *
+   * @param colorName - Color name to find
+   * @param palette - Color palette containing variants
+   * @returns Resolved color or undefined if not found
+   */
+  public findAndResolveVariantColor(colorName: string, palette: IColorPalette): string | undefined {
+    if (!palette.variants) {
+      return undefined;
+    }
+
+    for (const [themeId, overrides] of Object.entries(palette.variants)) {
+      if (overrides[colorName]) {
+        try {
+          return this.colorReferenceResolver(overrides[colorName], palette);
+        } catch (error) {
+          continue;
+        }
+      }
+    }
+
+    return undefined;
+  }
+}
+
+/**
  * Modus theme source analyzer implementation
  */
 class ModusThemeAnalyzer implements IThemeAnalyzer {
+  private readonly colorTransformer: IColorTransformer;
+  private readonly colorResolver: IColorResolver;
+
+  /**
+   * Construct a new Modus theme analyzer
+   */
+  constructor() {
+    this.colorTransformer = new StandardColorTransformer();
+    this.colorResolver = new StandardColorResolver(
+      this.colorTransformer,
+      this.resolveColorReference.bind(this)
+    );
+  }
+
   /**
    * Analyze a Modus theme source file
    *
@@ -510,6 +753,14 @@ class ModusThemeAnalyzer implements IThemeAnalyzer {
       return undefined;
     }
 
+    // Supports opacity syntax: "color-name@opacity" where opacity is a value
+    // between 0 and 1 Example: "bg-dim@0.5" applies 50% opacity to the bg-dim
+    // color
+    //
+    if (name.includes('@')) {
+      return this.colorResolver.resolveColorWithOpacity(name, palette);
+    }
+
     if (name.startsWith('#')) {
       return name;
     }
@@ -523,10 +774,9 @@ class ModusThemeAnalyzer implements IThemeAnalyzer {
     }
 
     if (palette.variants) {
-      for (const [themeId, overrides] of Object.entries(palette.variants)) {
-        if (overrides[name]) {
-          return this.resolveColorReference(overrides[name], palette);
-        }
+      const variantColor = this.findColorInVariants(name, palette.variants);
+      if (variantColor) {
+        return this.resolveColorReference(variantColor, palette);
       }
     }
 
@@ -534,6 +784,22 @@ class ModusThemeAnalyzer implements IThemeAnalyzer {
       `Invalid color reference: "${name}" not found in palette`,
       'COLOR_REFERENCE_ERROR'
     );
+  }
+
+  /**
+   * Finds a color in theme variants
+   *
+   * @param colorName - Color name to find
+   * @param variants - Theme variants to search
+   * @returns Color reference if found, undefined otherwise
+   */
+  private findColorInVariants(colorName: string, variants: Record<string, Record<string, string>>): string | undefined {
+    for (const [themeId, overrides] of Object.entries(variants)) {
+      if (overrides[colorName]) {
+        return overrides[colorName];
+      }
+    }
+    return undefined;
   }
 }
 
