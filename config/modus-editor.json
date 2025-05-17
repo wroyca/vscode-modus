@@ -57,6 +57,12 @@
   "editorGutter.deletedBackground"                        : "bg-removed-fringe",
   "editorGutter.deletedSecondaryBackground"               : "bg-removed-refine",
 
+  // The current line is typically shown as either background highlight or a
+  // border (not both).
+
+  "editor.lineHighlightBackground"                        : "bg-hl-line",
+  "editor.lineHighlightBorder"                            : "",
+
   // Diff editor colors
   //
   "diffEditor.insertedTextBackground"                     : "bg-added-refine",
