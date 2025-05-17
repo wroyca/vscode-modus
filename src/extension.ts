@@ -954,6 +954,8 @@ class VSCodeThemeSerializer implements IThemeSerializer {
    */
   public serialize(theme: IThemeVSC): any {
     return {
+      "$schema": "vscode://schemas/color-theme",
+
       name: theme.name,
       type: theme.type,
       colors: theme.colors,
