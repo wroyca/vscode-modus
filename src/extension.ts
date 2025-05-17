@@ -611,6 +611,12 @@ class StandardColorResolver implements IColorResolver {
       }
     }
 
+    for (const [themeId, overrides] of Object.entries(palette.variants)) {
+      if (overrides[colorName]) {
+        return overrides[colorName];
+      }
+    }
+
     return undefined;
   }
 }
@@ -774,7 +780,7 @@ class ModusThemeAnalyzer implements IThemeAnalyzer {
     }
 
     if (palette.variants) {
-      const variantColor = this.findColorInVariants(name, palette.variants);
+      const variantColor = this.colorResolver.findAndResolveVariantColor(name, palette);
       if (variantColor) {
         return this.resolveColorReference(variantColor, palette);
       }
@@ -784,22 +790,6 @@ class ModusThemeAnalyzer implements IThemeAnalyzer {
       `Invalid color reference: "${name}" not found in palette`,
       'COLOR_REFERENCE_ERROR'
     );
-  }
-
-  /**
-   * Finds a color in theme variants
-   *
-   * @param colorName - Color name to find
-   * @param variants - Theme variants to search
-   * @returns Color reference if found, undefined otherwise
-   */
-  private findColorInVariants(colorName: string, variants: Record<string, Record<string, string>>): string | undefined {
-    for (const [themeId, overrides] of Object.entries(variants)) {
-      if (overrides[colorName]) {
-        return overrides[colorName];
-      }
-    }
-    return undefined;
   }
 }
 
