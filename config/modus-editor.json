@@ -59,6 +59,27 @@
 
   // Diff editor colors
   //
+  "diffEditor.insertedTextBackground"                     : "bg-added-refine",
+  "diffEditor.insertedTextBorder"                         : "",
+  "diffEditor.removedTextBackground"                      : "bg-removed-refine",
+  "diffEditor.removedTextBorder"                          : "",
+  "diffEditor.insertedLineBackground"                     : "bg-added-faint",
+  "diffEditor.removedLineBackground"                      : "bg-removed-faint",
+  "diffEditorGutter.insertedLineBackground"               : "", // "bg-added-fringe",
+  "diffEditorGutter.removedLineBackground"                : "", // "bg-removed-fringe",
+  "diffEditorOverview.insertedForeground"                 : "bg-added-fringe",
+  "diffEditorOverview.removedForeground"                  : "bg-removed-fringe",
+  "diffEditor.unchangedRegionBackground"                  : "bg-diff-context",
+  "diffEditor.unchangedRegionForeground"                  : "fg-dim",
+  "diffEditor.unchangedRegionShadow"                      : "bg-inactive",
+  "diffEditor.unchangedCodeBackground"                    : "bg-diff-context",
+  "diffEditor.move.border"                                : "",
+  "diffEditor.moveActive.border"                          : "",
+  "diffEditor.border"                                     : "border",
+  "diffEditor.diagonalFill"                               : "fg-dim",
+  "multiDiffEditor.headerBackground"                      : "bg-diff-context",
+  "multiDiffEditor.background"                            : "bg-main",
+  "multiDiffEditor.border"                                : "border",
 
   // Chat colors
   //
