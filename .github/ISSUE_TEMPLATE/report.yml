@@ -1,0 +1,98 @@
+name: Theme Issue Report
+description: Report a contrast, color inconsistency, or theming deviation in the Modus VSCode theme.
+title: "[Theme Issue] <brief summary of the problem>"
+labels: [bug, needs-triage]
+body:
+
+- type: markdown
+  attributes:
+    value: |
+      ## Thank you for helping improve the Modus VSCode theme.
+
+      This theme is a best-effort port of the **Modus Operandi** and **Modus Vivendi** themes from Emacs to VSCode. While we strive to uphold the same standards of **accessibility**, **legibility**, and **visual consistency**, some aspects of the port may currently be incomplete or imperfect, including:
+
+      - Insufficient or imbalanced contrast levels
+      - Unstyled or inconsistently styled UI elements
+      - Suboptimal color mappings or placeholder decisions
+
+      **Please note:**
+      Resolving theme issues is rarely a matter of simply changing a color value. Each modification must be evaluated in terms of broader interface cohesion, consistency with the design language, and the overall UX across multiple UI contexts. That is, certain reports may lead to extended discussion or remain open while we explore the most appropriate resolution.
+
+- type: input
+  id: description
+  attributes:
+    label: Summary of the Issue
+    description: A short, specific summary of the issue encountered.
+    placeholder: e.g. "Insufficient contrast for highlighted items in the Explorer sidebar"
+  validations:
+    required: true
+
+- type: textarea
+  id: expected
+  attributes:
+    label: Expected Appearance or Behavior
+    description: Describe what you expected to see. Reference the desired color relationship, contrast level, or styling behavior where applicable.
+    placeholder: e.g. "The selection highlight should clearly stand out from the background, maintaining at least WCAG AAA contrast."
+  validations:
+    required: true
+
+- type: textarea
+  id: actual
+  attributes:
+    label: Actual Appearance or Behavior
+    description: Describe what you observed instead. Be as specific as possible regarding the visual outcome or deviation from expectations.
+    placeholder: e.g. "The selection highlight is barely distinguishable from the background, especially under bright lighting conditions."
+  validations:
+    required: true
+
+- type: textarea
+  id: screenshot
+  attributes:
+    label: Visual Reference (optional but strongly encouraged)
+    description: |
+      To support accurate assessment and maintain alignment with the original Modus design philosophy, please include visual references when available.
+
+      Recommended:
+      - A screenshot of the affected area as rendered in **VSCode**
+      - (Optional) A comparative screenshot from **Emacs using the equivalent Modus theme**
+
+      ⚠️ Please avoid linking to external image hosting services (e.g. Imgur), as these may expire or become inaccessible over time.
+    placeholder: Drag and drop image files here.
+
+- type: dropdown
+  id: theme
+  attributes:
+    label: Theme Variant in Use
+    description: Select the Modus variant you were using when the issue was observed.
+    options:
+      - Modus Operandi (light)
+      - Modus Operandi Tinted
+      - Modus Operandi Deuteranopia
+      - Modus Operandi Tritanopia
+      - Modus Vivendi (dark)
+      - Modus Vivendi Tinted
+      - Modus Vivendi Deuteranopia
+      - Modus Vivendi Tritanopia
+  validations:
+    required: true
+
+- type: input
+  id: vscode-version
+  attributes:
+    label: VSCode Version
+    description: Include the exact version of VSCode in use.
+    placeholder: e.g. 1.89.0
+  validations:
+    required: true
+
+- type: textarea
+  id: additional
+  attributes:
+    label: Additional Context or Technical Notes
+    description: |
+      If relevant, include any of the following:
+      - Extensions that may affect theming
+      - Settings or JSON snippets related to workbench appearance
+      - Known scopes or selector names involved (e.g. `tokenColors`, `editorGroupHeader`)
+      - Comparisons with other themes or color systems
+    placeholder: Optional but appreciated.
