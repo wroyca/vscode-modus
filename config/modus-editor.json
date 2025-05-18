@@ -292,13 +292,13 @@
   "editorStickyScrollHover.background"                  : "",
   "debugExceptionWidget.background"                     : "bg-dim",
   "debugExceptionWidget.border"                         : "border",
-  "editorMarkerNavigation.background"                   : "bg-dim",
+  "editorMarkerNavigation.background"                   : "bg-main",
   "editorMarkerNavigationError.background"              : "bg-prominent-err",
   "editorMarkerNavigationWarning.background"            : "bg-prominent-warning",
   "editorMarkerNavigationInfo.background"               : "bg-prominent-note",
-  "editorMarkerNavigationError.headerBackground"        : "err",
-  "editorMarkerNavigationWarning.headerBackground"      : "warning",
-  "editorMarkerNavigationInfo.headerBackground"         : "info",
+  "editorMarkerNavigationError.headerBackground"        : "bg-main",
+  "editorMarkerNavigationWarning.headerBackground"      : "bg-main",
+  "editorMarkerNavigationInfo.headerBackground"         : "bg-main",
 
   // Peek view colors
   //
