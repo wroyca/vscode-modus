@@ -1,7 +1,7 @@
 {
   // Base colors
   //
-  "focusBorder"                                         : "accent-1",
+  "focusBorder"                                         : "border",
   "foreground"                                          : "fg-main",
   "disabledForeground"                                  : "",
   "widget.border"                                       : "",
@@ -380,7 +380,7 @@
   "statusBarItem.warningHoverForeground"                : "",
   "statusBarItem.compactHoverBackground"                : "",
   "statusBarItem.focusBorder"                           : "",
-  "statusBar.focusBorder"                               : "accent-1",
+  "statusBar.focusBorder"                               : "border",
   "statusBarItem.offlineBackground"                     : "",
   "statusBarItem.offlineForeground"                     : "",
   "statusBarItem.offlineHoverForeground"                : "",
