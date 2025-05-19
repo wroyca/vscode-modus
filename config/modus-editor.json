@@ -304,6 +304,16 @@
 
   // Menu Bar colors
   //
+  "menubar.selectionForeground"                     : "fg-main",
+  "menubar.selectionBackground"                     : "bg-hover",
+  "menubar.selectionBorder"                         : "",
+  "menu.foreground"                                 : "fg-main",
+  "menu.background"                                 : "bg-dim",
+  "menu.selectionForeground"                        : "fg-main",
+  "menu.selectionBackground"                        : "bg-hover",
+  "menu.selectionBorder"                            : "",
+  "menu.separatorBackground"                        : "border",
+  "menu.border"                                     : "border",
 
   // Command Center colors
   //
