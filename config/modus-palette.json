@@ -1,37 +1,44 @@
 {
   "variants": {
     "modus-operandi": {
-      "title-bar.active-background"       : "#d7d7d7",
-      "title-bar.active-foreground"       : "fg-main"
-
+      "title-bar.active-background"   : "#d7d7d7",
+      "title-bar.active-foreground"   : "fg-main",
+      "tab.inactive-background"       : "#ECECEC"
     },
     "modus-vivendi": {
-      "title-bar.active-background"       : "#3f3f3f",
-      "title-bar.active-foreground"       : "fg-main"
+      "title-bar.active-background"   : "#3f3f3f",
+      "title-bar.active-foreground"   : "fg-main",
+      "tab.inactive-background"       : "#262625"
     },
     "modus-operandi-tinted": {
-      "title-bar.active-background"       : "#d7ccc6",
-      "title-bar.active-foreground"       : "fg-main"
+      "title-bar.active-background"   : "#d7ccc6",
+      "title-bar.active-foreground"   : "fg-main",
+      "tab.inactive-background"       : "#DFD5CF"
     },
     "modus-vivendi-tinted": {
-      "title-bar.active-background"       : "#353a52",
-      "title-bar.active-foreground"       : "fg-main"
+      "title-bar.active-background"   : "#353a52",
+      "title-bar.active-foreground"   : "fg-main",
+      "tab.inactive-background"       : "#252A3C"
     },
     "modus-operandi-deuteranopia": {
-      "title-bar.active-background"       : "#d7d7d7",
-      "title-bar.active-foreground"       : "fg-main"
+      "title-bar.active-background"   : "#d7d7d7",
+      "title-bar.active-foreground"   : "fg-main",
+      "tab.inactive-background"       : "#ECECEC"
     },
     "modus-vivendi-deuteranopia": {
-      "title-bar.active-background"       : "#3f3f3f",
-      "title-bar.active-foreground"       : "fg-main"
+      "title-bar.active-background"   : "#3f3f3f",
+      "title-bar.active-foreground"   : "fg-main",
+      "tab.inactive-background"       : "#262625"
     },
     "modus-operandi-tritanopia": {
-      "title-bar.active-background"       : "#d7d7d7",
-      "title-bar.active-foreground"       : "fg-main"
+      "title-bar.active-background"   : "#d7d7d7",
+      "title-bar.active-foreground"   : "fg-main",
+      "tab.inactive-background"       : "#ECECEC"
     },
     "modus-vivendi-tritanopia": {
-      "title-bar.active-background"       : "#3f3f3f",
-      "title-bar.active-foreground"       : "fg-main"
+      "title-bar.active-background"   : "#3f3f3f",
+      "title-bar.active-foreground"   : "fg-main",
+      "tab.inactive-background"       : "#262625"
     }
   }
 }
