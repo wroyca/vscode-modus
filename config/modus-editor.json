@@ -533,6 +533,30 @@
 
   // Settings Editor colors
   //
+  // TODO: Settings Editor colors require accessibility review - current implementation
+  // does not meet desired contrast ratios or color differentiation standards.
+  //
+  "settings.headerForeground"                       : "",
+  "settings.modifiedItemIndicator"                  : "",
+  "settings.dropdownBackground"                     : "",
+  "settings.dropdownForeground"                     : "",
+  "settings.dropdownBorder"                         : "",
+  "settings.dropdownListBorder"                     : "",
+  "settings.checkboxBackground"                     : "",
+  "settings.checkboxForeground"                     : "",
+  "settings.checkboxBorder"                         : "",
+  "settings.rowHoverBackground"                     : "fg-alt@0.1",
+  "settings.textInputBackground"                    : "",
+  "settings.textInputForeground"                    : "",
+  "settings.textInputBorder"                        : "",
+  "settings.numberInputBackground"                  : "",
+  "settings.numberInputForeground"                  : "",
+  "settings.numberInputBorder"                      : "",
+  "settings.focusedRowBackground"                   : "fg-alt@0.1",
+  "settings.focusedRowBorder"                       : "border",
+  "settings.headerBorder"                           : "border",
+  "settings.sashBorder"                             : "border",
+  "settings.settingsHeaderHoverForeground"          : ""
 
   // Breadcrumbs colors
   //
