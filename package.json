@@ -12,7 +12,7 @@
     "url": "https://github.com/wroyca/modus/issues"
   },
   "description": "Highly accessible themes for Visual Studio Code",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "engines": {
     "vscode": "^1.98.0"
   },
