@@ -20,6 +20,28 @@
 
   // Button control
   //
+  "button.background"                               : "bg-button-active",
+  "button.foreground"                               : "fg-button-active",
+  "button.border"                                   : "",
+  "button.separator"                                : "border",
+  "button.hoverBackground"                          : "bg-hover",
+  "button.secondaryForeground"                      : "",
+  "button.secondaryBackground"                      : "",
+  "button.secondaryHoverBackground"                 : "bg-hover-secondary",
+  "checkbox.background"                             : "",
+  "checkbox.foreground"                             : "",
+  "checkbox.disabled.background"                    : "",
+  "checkbox.disabled.foreground"                    : "",
+  "checkbox.border"                                 : "",
+  "checkbox.selectBackground"                       : "",
+  "checkbox.selectBorder"                           : "",
+  "radio.activeForeground"                          : "",
+  "radio.activeBackground"                          : "",
+  "radio.activeBorder"                              : "",
+  "radio.inactiveForeground"                        : "",
+  "radio.inactiveBackground"                        : "",
+  "radio.inactiveBorder"                            : "",
+  "radio.inactiveHoverBackground"                   : "",
 
   // Dropdown control
   //
