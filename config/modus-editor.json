@@ -82,7 +82,7 @@
   // Lists and trees
   //
   "list.activeSelectionBackground"                  : "bg-hover@0.2",
-  "list.activeSelectionForeground"                  : "",
+  "list.activeSelectionForeground"                  : "fg-main",
   "list.activeSelectionIconForeground"              : "",
   "list.dropBackground"                             : "",
   "list.focusBackground"                            : "",
@@ -122,7 +122,7 @@
   "activityBar.inactiveForeground"                  : "fg-dim",
   "activityBar.border"                              : "",
   "activityBarBadge.background"                     : "bg-blue-intense",
-  "activityBarBadge.foreground"                     : "",
+  "activityBarBadge.foreground"                     : "fg-main",
   "activityBar.activeBorder"                        : "",
   "activityBar.activeBackground"                    : "",
   "activityBar.activeFocusBorder"                   : "",
@@ -132,9 +132,9 @@
   "activityBarTop.dropBorder"                       : "",
   "activityBarTop.background"                       : "",
   "activityBarTop.activeBackground"                 : "",
-  "activityWarningBadge.foreground"                 : "",
+  "activityWarningBadge.foreground"                 : "fg-main",
   "activityWarningBadge.background"                 : "bg-yellow-intense",
-  "activityErrorBadge.foreground"                   : "",
+  "activityErrorBadge.foreground"                   : "fg-main",
   "activityErrorBadge.background"                   : "bg-red-intense",
 
   // Profiles
