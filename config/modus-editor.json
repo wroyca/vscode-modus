@@ -48,6 +48,23 @@
 
   // Input control
   //
+  "input.background"                                : "",
+  "input.border"                                    : "",
+  "input.foreground"                                : "",
+  "input.placeholderForeground"                     : "",
+  "inputOption.activeBackground"                    : "",
+  "inputOption.activeBorder"                        : "",
+  "inputOption.activeForeground"                    : "",
+  "inputOption.hoverBackground"                     : "",
+  "inputValidation.errorBackground"                 : "bg-prominent-err",
+  "inputValidation.errorForeground"                 : "fg-prominent-err",
+  "inputValidation.errorBorder"                     : "err",
+  "inputValidation.infoBackground"                  : "bg-prominent-note",
+  "inputValidation.infoForeground"                  : "fg-prominent-note",
+  "inputValidation.infoBorder"                      : "info",
+  "inputValidation.warningBackground"               : "bg-prominent-warning",
+  "inputValidation.warningForeground"               : "fg-prominent-warning",
+  "inputValidation.warningBorder"                   : "warning",
 
   // Scrollbar control
   //
