@@ -204,10 +204,28 @@
 
   // Editor colors
   //
-  "editor.background"                           : "bg-main",
-  "editor.foreground"                           : "fg-main",
-  "editorLineNumber.foreground"                 : "fg-line-number-inactive",
-  "editorLineNumber.activeForeground"           : "fg-line-number-active",
+  "editor.background"                               : "bg-main",
+  "editor.foreground"                               : "fg-main",
+  "editorLineNumber.foreground"                     : "fg-line-number-inactive",
+  "editorLineNumber.activeForeground"               : "fg-line-number-active",
+
+  // Errors and warnings:
+
+  "editorError.foreground"                          : "err",
+  "editorError.border"                              : "",
+  "editorError.background"                          : "",
+  "editorWarning.foreground"                        : "warning",
+  "editorWarning.border"                            : "",
+  "editorWarning.background"                        : "",
+  "editorInfo.foreground"                           : "info",
+  "editorInfo.border"                               : "",
+  "editorInfo.background"                           : "",
+  "editorHint.foreground"                           : "fg-dim",
+  "editorHint.border"                               : "",
+  "problemsErrorIcon.foreground"                    : "",
+  "problemsWarningIcon.foreground"                  : "",
+  "problemsInfoIcon.foreground"                     : "",
+
 
   // The gutter contains the glyph margins and the line numbers:
 
