@@ -254,6 +254,11 @@
   // defer to VS Code's defaults rather than overriding them, but this may
   // change in the future.
   //
+  // Moreover, since the concept of a window title bar does not exist in Emacs,
+  // we approximate its appearance by blending the `bg-active` and `bg-inactive`
+  // colors at approximately 33%. This is loosely modeled after Visual Studio
+  // Code dark theme, which employs a similar visual hierarchy.
+  //
   "titleBar.activeBackground"                 : "title-bar.active-background",
   "titleBar.activeForeground"                 : "title-bar.active-foreground",
   "titleBar.inactiveBackground"               : "",
