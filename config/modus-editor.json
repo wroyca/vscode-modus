@@ -6,7 +6,7 @@
   "disabledForeground"                              : "fg-dim",
   "widget.border"                                   : "",
   "widget.shadow"                                   : "",
-  "selection.background"                            : "",
+  "selection.background"                            : "bg-region",
   "descriptionForeground"                           : "",
   "errorForeground"                                 : "err",
   "icon.foreground"                                 : "",
@@ -28,7 +28,7 @@
   "button.secondaryForeground"                      : "",
   "button.secondaryBackground"                      : "",
   "button.secondaryHoverBackground"                 : "bg-hover-secondary",
-  "checkbox.background"                             : "",
+  "checkbox.background"                             : "bg-inactive",
   "checkbox.foreground"                             : "",
   "checkbox.disabled.background"                    : "",
   "checkbox.disabled.foreground"                    : "",
@@ -45,14 +45,14 @@
 
   // Dropdown control
   //
-  "dropdown.background"                             : "",
+  "dropdown.background"                             : "bg-inactive",
   "dropdown.listBackground"                         : "",
   "dropdown.border"                                 : "",
   "dropdown.foreground"                             : "",
 
   // Input control
   //
-  "input.background"                                : "",
+  "input.background"                                : "bg-inactive",
   "input.border"                                    : "",
   "input.foreground"                                : "",
   "input.placeholderForeground"                     : "",
@@ -81,26 +81,26 @@
 
   // Lists and trees
   //
-  "list.activeSelectionBackground"                  : "",
+  "list.activeSelectionBackground"                  : "bg-hover@0.2",
   "list.activeSelectionForeground"                  : "",
   "list.activeSelectionIconForeground"              : "",
   "list.dropBackground"                             : "",
   "list.focusBackground"                            : "",
   "list.focusForeground"                            : "",
-  "list.focusHighlightForeground"                   : "",
-  "list.focusOutline"                               : "",
+  "list.focusHighlightForeground"                   : "fg-completion-match-0",
+  "list.focusOutline"                               : "bg-hover",
   "list.focusAndSelectionOutline"                   : "",
-  "list.highlightForeground"                        : "",
+  "list.highlightForeground"                        : "fg-completion-match-0",
   "list.hoverBackground"                            : "bg-hover", // FIXME: too low contrast
   "list.hoverForeground"                            : "fg-main",
-  "list.inactiveSelectionBackground"                : "",
+  "list.inactiveSelectionBackground"                : "bg-inactive",
   "list.inactiveSelectionForeground"                : "",
   "list.inactiveSelectionIconForeground"            : "",
   "list.inactiveFocusBackground"                    : "",
   "list.inactiveFocusOutline"                       : "",
   "list.invalidItemForeground"                      : "",
-  "list.errorForeground"                            : "",
-  "list.warningForeground"                          : "",
+  "list.errorForeground"                            : "err",
+  "list.warningForeground"                          : "warning",
   "listFilterWidget.background"                     : "",
   "listFilterWidget.outline"                        : "",
   "listFilterWidget.noMatchesOutline"               : "",
@@ -121,7 +121,7 @@
   "activityBar.foreground"                          : "fg-main",
   "activityBar.inactiveForeground"                  : "fg-dim",
   "activityBar.border"                              : "",
-  "activityBarBadge.background"                     : "",
+  "activityBarBadge.background"                     : "bg-blue-intense",
   "activityBarBadge.foreground"                     : "",
   "activityBar.activeBorder"                        : "",
   "activityBar.activeBackground"                    : "",
@@ -133,9 +133,9 @@
   "activityBarTop.background"                       : "",
   "activityBarTop.activeBackground"                 : "",
   "activityWarningBadge.foreground"                 : "",
-  "activityWarningBadge.background"                 : "",
+  "activityWarningBadge.background"                 : "bg-yellow-intense",
   "activityErrorBadge.foreground"                   : "",
-  "activityErrorBadge.background"                   : "",
+  "activityErrorBadge.background"                   : "bg-red-intense",
 
   // Profiles
   //
@@ -143,7 +143,7 @@
   // Side Bar
   //
   "sideBar.background"                              : "bg-dim",
-  "sideBar.foreground"                              : "",
+  "sideBar.foreground"                              : "fg-main@0.8",
   "sideBar.border"                                  : "",
   "sideBar.dropBackground"                          : "",
   "sideBarTitle.foreground"                         : "",
@@ -176,7 +176,7 @@
   "tab.activeBackground"                            : "",
   "tab.unfocusedActiveBackground"                   : "",
   "tab.activeForeground"                            : "",
-  "tab.border"                                      : "",
+  "tab.border"                                      : "bg-dim",
   "tab.activeBorder"                                : "",
   "tab.selectedBorderTop"                           : "",
   "tab.selectedBackground"                          : "",
@@ -212,6 +212,7 @@
   "editor.foreground"                               : "fg-main",
   "editorLineNumber.foreground"                     : "fg-line-number-inactive",
   "editorLineNumber.activeForeground"               : "fg-line-number-active",
+  "editor.selectionBackground"                      : "bg-region",
 
   // Errors and warnings:
 
@@ -430,17 +431,17 @@
 
   // Notification colors
   //
-  "notificationCenter.border": "",
-  "notificationCenterHeader.foreground": "",
-  "notificationCenterHeader.background": "",
-  "notificationToast.border": "",
-  "notifications.foreground": "",
-  "notifications.background": "bg-dim",
-  "notifications.border": "",
-  "notificationLink.foreground": "",
-  "notificationsErrorIcon.foreground": "err",
-  "notificationsWarningIcon.foreground": "warning",
-  "notificationsInfoIcon.foreground": "info",
+  "notificationCenter.border"                       : "",
+  "notificationCenterHeader.foreground"             : "",
+  "notificationCenterHeader.background"             : "",
+  "notificationToast.border"                        : "",
+  "notifications.foreground"                        : "",
+  "notifications.background"                        : "bg-dim",
+  "notifications.border"                            : "",
+  "notificationLink.foreground"                     : "",
+  "notificationsErrorIcon.foreground"               : "err",
+  "notificationsWarningIcon.foreground"             : "warning",
+  "notificationsInfoIcon.foreground"                : "info",
 
 
   // Banner colors
@@ -522,24 +523,24 @@
 
   // Debug colors
   //
-  "debugToolBar.background": "bg-dim",
-  "debugToolBar.border": "",
-  "editor.stackFrameHighlightBackground": "",
-  "editor.focusedStackFrameHighlightBackground": "",
-  "editor.inlineValuesForeground": "",
-  "editor.inlineValuesBackground": "",
-  "debugView.exceptionLabelForeground": "",
-  "debugView.exceptionLabelBackground": "",
-  "debugView.stateLabelForeground": "",
-  "debugView.stateLabelBackground": "",
-  "debugView.valueChangedHighlight": "",
-  "debugTokenExpression.name": "",
-  "debugTokenExpression.value": "",
-  "debugTokenExpression.string": "",
-  "debugTokenExpression.boolean": "",
-  "debugTokenExpression.number": "",
-  "debugTokenExpression.error": "",
-  "debugTokenExpression.type": "",
+  "debugToolBar.background"                         : "bg-dim",
+  "debugToolBar.border"                             : "",
+  "editor.stackFrameHighlightBackground"            : "",
+  "editor.focusedStackFrameHighlightBackground"     : "",
+  "editor.inlineValuesForeground"                   : "",
+  "editor.inlineValuesBackground"                   : "",
+  "debugView.exceptionLabelForeground"              : "",
+  "debugView.exceptionLabelBackground"              : "",
+  "debugView.stateLabelForeground"                  : "",
+  "debugView.stateLabelBackground"                  : "",
+  "debugView.valueChangedHighlight"                 : "",
+  "debugTokenExpression.name"                       : "",
+  "debugTokenExpression.value"                      : "",
+  "debugTokenExpression.string"                     : "",
+  "debugTokenExpression.boolean"                    : "",
+  "debugTokenExpression.number"                     : "",
+  "debugTokenExpression.error"                      : "",
+  "debugTokenExpression.type"                       : "",
 
   // Testing colors
   //
