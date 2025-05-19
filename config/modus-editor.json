@@ -430,6 +430,18 @@
 
   // Notification colors
   //
+  "notificationCenter.border": "",
+  "notificationCenterHeader.foreground": "",
+  "notificationCenterHeader.background": "",
+  "notificationToast.border": "",
+  "notifications.foreground": "",
+  "notifications.background": "bg-dim",
+  "notifications.border": "",
+  "notificationLink.foreground": "",
+  "notificationsErrorIcon.foreground": "err",
+  "notificationsWarningIcon.foreground": "warning",
+  "notificationsInfoIcon.foreground": "info",
+
 
   // Banner colors
   //
