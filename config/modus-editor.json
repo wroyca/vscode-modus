@@ -401,6 +401,17 @@
 
   // Git colors
   //
+  "gitDecoration.addedResourceForeground"           : "fg-added",
+  "gitDecoration.modifiedResourceForeground"        : "fg-changed",
+  "gitDecoration.deletedResourceForeground"         : "fg-removed",
+  "gitDecoration.renamedResourceForeground"         : "fg-added-intense",
+  "gitDecoration.stageModifiedResourceForeground"   : "fg-changed-intense",
+  "gitDecoration.stageDeletedResourceForeground"    : "fg-removed-intense",
+  "gitDecoration.untrackedResourceForeground"       : "fg-alt",
+  "gitDecoration.ignoredResourceForeground"         : "fg-dim",
+  "gitDecoration.conflictingResourceForeground"     : "bg-removed-fringe",
+  "gitDecoration.submoduleResourceForeground"       : "bg-changed-fringe",
+  "git.blame.editorDecorationForeground"            : "fg-changed",
 
   // Source Control Graph colors
   //
