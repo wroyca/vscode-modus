@@ -1,16 +1,16 @@
 {
   // Base colors
   //
-  "focusBorder"                                         : "border",
-  "foreground"                                          : "fg-main",
-  "disabledForeground"                                  : "",
-  "widget.border"                                       : "",
-  "widget.shadow"                                       : "",
-  "selection.background"                                : "",
-  "descriptionForeground"                               : "",
-  "errorForeground"                                     : "err",
-  "icon.foreground"                                     : "",
-  "sash.hoverBorder"                                    : "bg-completion",
+  "focusBorder"                               : "border",
+  "foreground"                                : "fg-main",
+  "disabledForeground"                        : "fg-dim",
+  "widget.border"                             : "",
+  "widget.shadow"                             : "",
+  "selection.background"                      : "",
+  "descriptionForeground"                     : "",
+  "errorForeground"                           : "err",
+  "icon.foreground"                           : "",
+  "sash.hoverBorder"                          : "bg-hover",
 
   // Text colors
   //
@@ -20,58 +20,12 @@
 
   // Button control
   //
-  // TODO: Consider using accent color for background, but be
-  // mindful that contrast could be an issue.
-  //
-  "button.background"                                   : "bg-button-active",
-  "button.foreground"                                   : "fg-button-active",
-  "button.border"                                       : "",
-  "button.separator"                                    : "",
-  "button.hoverBackground"                              : "",
-  "button.secondaryForeground"                          : "",
-  "button.secondaryBackground"                          : "",
-  "button.secondaryHoverBackground"                     : "",
-  "checkbox.background"                                 : "",
-  "checkbox.foreground"                                 : "",
-  "checkbox.disabled.background"                        : "",
-  "checkbox.disabled.foreground"                        : "",
-  "checkbox.border"                                     : "",
-  "checkbox.selectBackground"                           : "",
-  "checkbox.selectBorder"                               : "",
-  "radio.activeForeground"                              : "",
-  "radio.activeBackground"                              : "",
-  "radio.activeBorder"                                  : "",
-  "radio.inactiveForeground"                            : "",
-  "radio.inactiveBackground"                            : "",
-  "radio.inactiveBorder"                                : "",
-  "radio.inactiveHoverBackground"                       : "",
 
   // Dropdown control
   //
-  "dropdown.background"                                 : "bg-dim",
-  "dropdown.listBackground"                             : "bg-main",
-  "dropdown.border"                                     : "bg-inactive",
-  "dropdown.foreground"                                 : "fg-main",
 
   // Input control
   //
-  "input.background"                                    : "bg-dim",
-  "input.border"                                        : "bg-inactive",
-  "input.foreground"                                    : "fg-main",
-  "input.placeholderForeground"                         : "fg-dim",
-  "inputOption.activeBackground"                        : "",
-  "inputOption.activeBorder"                            : "",
-  "inputOption.activeForeground"                        : "",
-  "inputOption.hoverBackground"                         : "",
-  "inputValidation.errorBackground"                     : "bg-prominent-err",
-  "inputValidation.errorForeground"                     : "fg-prominent-err",
-  "inputValidation.errorBorder"                         : "err",
-  "inputValidation.infoBackground"                      : "bg-prominent-note",
-  "inputValidation.infoForeground"                      : "fg-prominent-note",
-  "inputValidation.infoBorder"                          : "info",
-  "inputValidation.warningBackground"                   : "bg-prominent-warning",
-  "inputValidation.warningForeground"                   : "fg-prominent-warning",
-  "inputValidation.warningBorder"                       : "warning",
 
   // Scrollbar control
   //
@@ -84,175 +38,139 @@
 
   // Lists and trees
   //
-  "list.activeSelectionBackground"                      : "bg-active",
-  "list.activeSelectionForeground"                      : "",
-  "list.activeSelectionIconForeground"                  : "",
-  "list.dropBackground"                                 : "",
-  "list.focusBackground"                                : "",
-  "list.focusForeground"                                : "",
-  "list.focusHighlightForeground"                       : "",
-  "list.focusOutline"                                   : "bg-active",
-  "list.focusAndSelectionOutline"                       : "",
-  "list.highlightForeground"                            : "",
-  "list.hoverBackground"                                : "bg-completion",
-  "list.hoverForeground"                                : "",
-  "list.inactiveSelectionBackground"                    : "",
-  "list.inactiveSelectionForeground"                    : "",
-  "list.inactiveSelectionIconForeground"                : "",
-  "list.inactiveFocusBackground"                        : "",
-  "list.inactiveFocusOutline"                           : "",
-  "list.invalidItemForeground"                          : "",
-  "list.errorForeground"                                : "err",
-  "list.warningForeground"                              : "warning",
-  "listFilterWidget.background"                         : "",
-  "listFilterWidget.outline"                            : "",
-  "listFilterWidget.noMatchesOutline"                   : "",
-  "listFilterWidget.shadow"                             : "",
-  "list.filterMatchBackground"                          : "",
-  "list.filterMatchBorder"                              : "",
-  "list.deemphasizedForeground"                         : "",
-  "list.dropBetweenBackground"                          : "",
-  "tree.indentGuidesStroke"                             : "",
-  "tree.inactiveIndentGuidesStroke"                     : "",
-  "tree.tableColumnsBorder"                             : "",
-  "tree.tableOddRowsBackground"                         : "",
+  "list.activeSelectionBackground"            : "",
+  "list.activeSelectionForeground"            : "",
+  "list.activeSelectionIconForeground"        : "",
+  "list.dropBackground"                       : "",
+  "list.focusBackground"                      : "",
+  "list.focusForeground"                      : "",
+  "list.focusHighlightForeground"             : "",
+  "list.focusOutline"                         : "",
+  "list.focusAndSelectionOutline"             : "",
+  "list.highlightForeground"                  : "",
+  "list.hoverBackground"                      : "bg-hover", // FIXME: too low contrast
+  "list.hoverForeground"                      : "fg-main",
+  "list.inactiveSelectionBackground"          : "",
+  "list.inactiveSelectionForeground"          : "",
+  "list.inactiveSelectionIconForeground"      : "",
+  "list.inactiveFocusBackground"              : "",
+  "list.inactiveFocusOutline"                 : "",
+  "list.invalidItemForeground"                : "",
+  "list.errorForeground"                      : "",
+  "list.warningForeground"                    : "",
+  "listFilterWidget.background"               : "",
+  "listFilterWidget.outline"                  : "",
+  "listFilterWidget.noMatchesOutline"         : "",
+  "listFilterWidget.shadow"                   : "",
+  "list.filterMatchBackground"                : "",
+  "list.filterMatchBorder"                    : "",
+  "list.deemphasizedForeground"               : "",
+  "list.dropBetweenBackground"                : "",
+  "tree.indentGuidesStroke"                   : "",
+  "tree.inactiveIndentGuidesStroke"           : "",
+  "tree.tableColumnsBorder"                   : "",
+  "tree.tableOddRowsBackground"               : "",
 
   // Activity Bar
   //
-  "activityBar.background"                              : "bg-dim",
-  "activityBar.dropBorder"                              : "",
-  "activityBar.foreground"                              : "fg-main",
-  "activityBar.inactiveForeground"                      : "",
-  "activityBar.border"                                  : "bg-inactive",
-  "activityBarBadge.background"                         : "",
-  "activityBarBadge.foreground"                         : "",
-  "activityBar.activeBorder"                            : "",
-  "activityBar.activeBackground"                        : "",
-  "activityBar.activeFocusBorder"                       : "",
-  "activityBarTop.foreground"                           : "",
-  "activityBarTop.activeBorder"                         : "",
-  "activityBarTop.inactiveForeground"                   : "",
-  "activityBarTop.dropBorder"                           : "",
-  "activityBarTop.background"                           : "",
-  "activityBarTop.activeBackground"                     : "",
-  "activityWarningBadge.foreground"                     : "fg-prominent-warning",
-  "activityWarningBadge.background"                     : "bg-prominent-warning",
-  "activityErrorBadge.foreground"                       : "fg-prominent-err",
-  "activityErrorBadge.background"                       : "bg-prominent-err",
+  "activityBar.background"                    : "bg-inactive",
+  "activityBar.dropBorder"                    : "",
+  "activityBar.foreground"                    : "fg-main",
+  "activityBar.inactiveForeground"            : "fg-dim",
+  "activityBar.border"                        : "",
+  "activityBarBadge.background"               : "",
+  "activityBarBadge.foreground"               : "",
+  "activityBar.activeBorder"                  : "",
+  "activityBar.activeBackground"              : "",
+  "activityBar.activeFocusBorder"             : "",
+  "activityBarTop.foreground"                 : "",
+  "activityBarTop.activeBorder"               : "",
+  "activityBarTop.inactiveForeground"         : "",
+  "activityBarTop.dropBorder"                 : "",
+  "activityBarTop.background"                 : "",
+  "activityBarTop.activeBackground"           : "",
+  "activityWarningBadge.foreground"           : "",
+  "activityWarningBadge.background"           : "",
+  "activityErrorBadge.foreground"             : "",
+  "activityErrorBadge.background"             : "",
 
   // Profiles
   //
 
   // Side Bar
   //
-  "sideBar.background"                                  : "bg-dim",
-  "sideBar.foreground"                                  : "",
-  "sideBar.border"                                      : "bg-inactive",
-  "sideBar.dropBackground"                              : "",
-  "sideBarTitle.foreground"                             : "",
-  "sideBarSectionHeader.background"                     : "bg-dim",
-  "sideBarSectionHeader.foreground"                     : "",
-  "sideBarSectionHeader.border"                         : "bg-inactive",
-  "sideBarActivityBarTop.border"                        : "",
-  "sideBarTitle.background"                             : "",
-  "sideBarTitle.border"                                 : "",
-  "sideBarStickyScroll.background"                      : "",
-  "sideBarStickyScroll.border"                          : "",
-  "sideBarStickyScroll.shadow"                          : "",
+  "sideBar.background"                        : "bg-dim",
+  "sideBar.foreground"                        : "",
+  "sideBar.border"                            : "",
+  "sideBar.dropBackground"                    : "",
+  "sideBarTitle.foreground"                   : "",
+  "sideBarSectionHeader.background"           : "bg-dim",
+  "sideBarSectionHeader.foreground"           : "",
+  "sideBarSectionHeader.border"               : "border",
+  "sideBarActivityBarTop.border"              : "",
+  "sideBarTitle.background"                   : "",
+  "sideBarTitle.border"                       : "",
+  "sideBarStickyScroll.background"            : "",
+  "sideBarStickyScroll.border"                : "",
+  "sideBarStickyScroll.shadow"                : "",
 
   // Minimap
   //
 
   // Editor Groups & Tabs
   //
-  "editorGroup.border"                                  : "bg-inactive",
-  "editorGroup.dropBackground"                          : "",
-  "editorGroupHeader.noTabsBackground"                  : "",
-  "editorGroupHeader.tabsBackground"                    : "bg-dim",
-  "editorGroupHeader.tabsBorder"                        : "bg-inactive",
-  "editorGroupHeader.border"                            : "",
-  "editorGroup.emptyBackground"                         : "",
-  "editorGroup.focusedEmptyBorder"                      : "",
-  "editorGroup.dropIntoPromptForeground"                : "",
-  "editorGroup.dropIntoPromptBackground"                : "",
-  "editorGroup.dropIntoPromptBorder"                    : "",
-  "tab.activeBackground"                                : "",
-  "tab.unfocusedActiveBackground"                       : "",
-  "tab.activeForeground"                                : "",
-  "tab.border"                                          : "bg-inactive",
-  "tab.activeBorder"                                    : "bg-main",
-  "tab.selectedBorderTop"                               : "",
-  "tab.selectedBackground"                              : "",
-  "tab.selectedForeground"                              : "",
-  "tab.dragAndDropBorder"                               : "bg-active",
-  "tab.unfocusedActiveBorder"                           : "bg-main",
-  "tab.activeBorderTop"                                 : "bg-completion",
-  "tab.unfocusedActiveBorderTop"                        : "",
-  "tab.lastPinnedBorder"                                : "bg-inactive",
-  "tab.inactiveBackground"                              : "bg-dim",
-  "tab.unfocusedInactiveBackground"                     : "",
-  "tab.inactiveForeground"                              : "",
-  "tab.unfocusedActiveForeground"                       : "",
-  "tab.unfocusedInactiveForeground"                     : "",
-  "tab.hoverBackground"                                 : "bg-completion",
-  "tab.unfocusedHoverBackground"                        : "",
-  "tab.hoverForeground"                                 : "fg-main",
-  "tab.unfocusedHoverForeground"                        : "",
-  "tab.hoverBorder"                                     : "",
-  "tab.unfocusedHoverBorder"                            : "",
-  "tab.activeModifiedBorder"                            : "",
-  "tab.inactiveModifiedBorder"                          : "",
-  "tab.unfocusedActiveModifiedBorder"                   : "",
-  "tab.unfocusedInactiveModifiedBorder"                 : "",
-  "editorPane.background"                               : "",
-  "sideBySideEditor.horizontalBorder"                   : "",
-  "sideBySideEditor.verticalBorder"                     : "",
+  // Editor Groups & Tabs
+  //
+  "editorGroup.border"                        : "border",
+  "editorGroup.dropBackground"                : "",
+  "editorGroupHeader.noTabsBackground"        : "",
+  "editorGroupHeader.tabsBackground"          : "bg-dim",
+  "editorGroupHeader.tabsBorder"              : "",
+  "editorGroupHeader.border"                  : "",
+  "editorGroup.emptyBackground"               : "",
+  "editorGroup.focusedEmptyBorder"            : "",
+  "editorGroup.dropIntoPromptForeground"      : "",
+  "editorGroup.dropIntoPromptBackground"      : "",
+  "editorGroup.dropIntoPromptBorder"          : "",
+  "tab.activeBackground"                      : "",
+  "tab.unfocusedActiveBackground"             : "",
+  "tab.activeForeground"                      : "",
+  "tab.border"                                : "",
+  "tab.activeBorder"                          : "",
+  "tab.selectedBorderTop"                     : "",
+  "tab.selectedBackground"                    : "",
+  "tab.selectedForeground"                    : "",
+  "tab.dragAndDropBorder"                     : "",
+  "tab.unfocusedActiveBorder"                 : "",
+  "tab.activeBorderTop"                       : "",
+  "tab.unfocusedActiveBorderTop"              : "",
+  "tab.lastPinnedBorder"                      : "",
+  "tab.inactiveBackground"                    : "bg-inactive",
+  "tab.unfocusedInactiveBackground"           : "",
+  "tab.inactiveForeground"                    : "",
+  "tab.unfocusedActiveForeground"             : "",
+  "tab.unfocusedInactiveForeground"           : "",
+  "tab.hoverBackground"                       : "bg-hover",
+  "tab.unfocusedHoverBackground"              : "",
+  "tab.hoverForeground"                       : "fg-main",
+  "tab.unfocusedHoverForeground"              : "",
+  "tab.hoverBorder"                           : "",
+  "tab.unfocusedHoverBorder"                  : "",
+  "tab.activeModifiedBorder"                  : "",
+  "tab.inactiveModifiedBorder"                : "",
+  "tab.unfocusedActiveModifiedBorder"         : "",
+  "tab.unfocusedInactiveModifiedBorder"       : "",
+  "editorPane.background"                     : "",
+  "sideBySideEditor.horizontalBorder"         : "border",
+  "sideBySideEditor.verticalBorder"           : "border",
+
 
   // Editor colors
   //
-  "editor.background"                                   : "bg-main",
-  "editor.foreground"                                   : "fg-main",
-  "editorLineNumber.foreground"                         : "fg-line-number-inactive",
-  "editorLineNumber.activeForeground"                   : "fg-line-number-active",
-
-  // The gutter contains the glyph margins and the line numbers:
-
-  "editorGutter.modifiedBackground"                     : "bg-changed-fringe",
-  "editorGutter.modifiedSecondaryBackground"            : "bg-changed-refine",
-  "editorGutter.addedBackground"                        : "bg-added-fringe",
-  "editorGutter.addedSecondaryBackground"               : "bg-added-refine",
-  "editorGutter.deletedBackground"                      : "bg-removed-fringe",
-  "editorGutter.deletedSecondaryBackground"             : "bg-removed-refine",
-
-  // The current line is typically shown as either background highlight or a
-  // border (not both).
-
-  "editor.lineHighlightBackground"                      : "bg-hl-line",
-  "editor.lineHighlightBorder"                          : "",
-
-  // Diff editor colors
-  //
-  "diffEditor.insertedTextBackground"                   : "bg-added-refine",
-  "diffEditor.insertedTextBorder"                       : "",
-  "diffEditor.removedTextBackground"                    : "bg-removed-refine",
-  "diffEditor.removedTextBorder"                        : "",
-  "diffEditor.insertedLineBackground"                   : "bg-added-faint",
-  "diffEditor.removedLineBackground"                    : "bg-removed-faint",
-  "diffEditorGutter.insertedLineBackground"             : "", // "bg-added-fringe",
-  "diffEditorGutter.removedLineBackground"              : "", // "bg-removed-fringe",
-  "diffEditorOverview.insertedForeground"               : "bg-added-fringe",
-  "diffEditorOverview.removedForeground"                : "bg-removed-fringe",
-  "diffEditor.unchangedRegionBackground"                : "bg-diff-context",
-  "diffEditor.unchangedRegionForeground"                : "fg-dim",
-  "diffEditor.unchangedRegionShadow"                    : "bg-inactive",
-  "diffEditor.unchangedCodeBackground"                  : "bg-diff-context",
-  "diffEditor.move.border"                              : "",
-  "diffEditor.moveActive.border"                        : "",
-  "diffEditor.border"                                   : "border",
-  "diffEditor.diagonalFill"                             : "fg-dim",
-  "multiDiffEditor.headerBackground"                    : "bg-diff-context",
-  "multiDiffEditor.background"                          : "bg-main",
-  "multiDiffEditor.border"                              : "border",
+  "editor.background"                         : "bg-main",
+  "editor.foreground"                         : "fg-main",
+  "editorLineNumber.foreground"               : "fg-line-number-inactive",
+  "editorLineNumber.activeForeground"         : "fg-line-number-active",
 
   // Chat colors
   //
@@ -265,183 +183,100 @@
 
   // Editor widget colors
   //
-  "editorWidget.foreground"                             : "fg-main",
-  "editorWidget.background"                             : "bg-dim",
-  "editorWidget.border"                                 : "bg-inactive",
-  "editorWidget.resizeBorder"                           : "",
-  "editorSuggestWidget.background"                      : "bg-dim",
-  "editorSuggestWidget.border"                          : "bg-inactive",
-  "editorSuggestWidget.foreground"                      : "",
-  "editorSuggestWidget.highlightForeground"             : "fg-completion-match-1",
-  "editorSuggestWidget.focusHighlightForeground"        : "fg-completion-match-1",
-  "editorSuggestWidget.selectedBackground"              : "bg-completion",
-  "editorSuggestWidget.selectedForeground"              : "fg-main",
-  "editorSuggestWidget.selectedIconForeground"          : "",
-  "editorSuggestWidgetStatus.foreground"                : "",
-  "editorHoverWidget.foreground"                        : "",
-  "editorHoverWidget.background"                        : "",
-  "editorHoverWidget.border"                            : "",
-  "editorHoverWidget.highlightForeground"               : "",
-  "editorHoverWidget.statusBarBackground"               : "",
-  "editorGhostText.border"                              : "",
-  "editorGhostText.background"                          : "",
-  "editorGhostText.foreground"                          : "",
-  "editorStickyScroll.background"                       : "",
-  "editorStickyScroll.border"                           : "",
-  "editorStickyScroll.shadow"                           : "",
-  "editorStickyScrollHover.background"                  : "",
-  "debugExceptionWidget.background"                     : "bg-dim",
-  "debugExceptionWidget.border"                         : "border",
-  "editorMarkerNavigation.background"                   : "bg-main",
-  "editorMarkerNavigationError.background"              : "bg-prominent-err",
-  "editorMarkerNavigationWarning.background"            : "bg-prominent-warning",
-  "editorMarkerNavigationInfo.background"               : "bg-prominent-note",
-  "editorMarkerNavigationError.headerBackground"        : "bg-main",
-  "editorMarkerNavigationWarning.headerBackground"      : "bg-main",
-  "editorMarkerNavigationInfo.headerBackground"         : "bg-main",
 
   // Peek view colors
   //
-  "peekView.border"                                     : "bg-inactive",
-  "peekViewEditor.background"                           : "bg-main",
-  "peekViewEditorGutter.background"                     : "",
-  "peekViewEditor.matchHighlightBackground"             : "",
-  "peekViewEditor.matchHighlightBorder"                 : "",
-  "peekViewResult.background"                           : "bg-dim",
-  "peekViewResult.fileForeground"                       : "",
-  "peekViewResult.lineForeground"                       : "",
-  "peekViewResult.matchHighlightBackground"             : "",
-  "peekViewResult.selectionBackground"                  : "",
-  "peekViewResult.selectionForeground"                  : "",
-  "peekViewTitle.background"                            : "bg-dim",
-  "peekViewTitleDescription.foreground"                 : "",
-  "peekViewTitleLabel.foreground"                       : "",
 
   // Merge conflicts colors
   //
-  "editorOverviewRuler.commentForeground"               : "bg-added-refine",
-  "editorOverviewRuler.commentUnresolvedForeground"     : "bg-removed-refine",
-  "editorOverviewRuler.commonContentForeground"         : "bg-changed-fringe",
-  "editorOverviewRuler.currentContentForeground"        : "bg-added-fringe",
-  "editorOverviewRuler.incomingContentForeground"       : "bg-removed-fringe",
-  "merge.border"                                        : "bg-diff-context",
-  "merge.commonContentBackground"                       : "bg-changed-faint@0.8",
-  "merge.commonHeaderBackground"                        : "bg-changed@0.8",
-  "merge.currentContentBackground"                      : "bg-added-faint@0.8",
-  "merge.currentHeaderBackground"                       : "bg-added@0.8",
-  "merge.incomingContentBackground"                     : "bg-removed-faint@0.8",
-  "merge.incomingHeaderBackground"                      : "bg-removed@0.8",
-  "mergeEditor.change.background"                       : "bg-changed-refine",
-  "mergeEditor.change.word.background"                  : "bg-changed",
-  "mergeEditor.changeBase.background"                   : "bg-changed-faint",
-  "mergeEditor.changeBase.word.background"              : "bg-changed",
-  "mergeEditor.conflict.handled.minimapOverViewRuler"   : "bg-added-fringe",
-  "mergeEditor.conflict.handledFocused.border"          : "fg-added-intense",
-  "mergeEditor.conflict.handledUnfocused.border"        : "bg-added-fringe",
-  "mergeEditor.conflict.input1.background"              : "bg-added-faint",
-  "mergeEditor.conflict.input2.background"              : "bg-removed-faint",
-  "mergeEditor.conflict.unhandled.minimapOverViewRuler" : "bg-removed-fringe",
-  "mergeEditor.conflict.unhandledFocused.border"        : "fg-removed-intense",
-  "mergeEditor.conflict.unhandledUnfocused.border"      : "bg-removed-fringe",
-  "mergeEditor.conflictingLines.background"             : "bg-diff-context",
 
   // Panel colors
   //
 
   // Status Bar colors
   //
-  "statusBar.background"                                : "bg-dim",
-  "statusBar.foreground"                                : "fg-main",
-  "statusBar.border"                                    : "bg-inactive",
-  "statusBar.debuggingBackground"                       : "",
-  "statusBar.debuggingForeground"                       : "",
-  "statusBar.debuggingBorder"                           : "",
-  "statusBar.noFolderForeground"                        : "",
-  "statusBar.noFolderBackground"                        : "",
-  "statusBar.noFolderBorder"                            : "",
-  "statusBarItem.activeBackground"                      : "",
-  "statusBarItem.hoverForeground"                       : "",
-  "statusBarItem.hoverBackground"                       : "",
-  "statusBarItem.prominentForeground"                   : "",
-  "statusBarItem.prominentBackground"                   : "",
-  "statusBarItem.prominentHoverForeground"              : "",
-  "statusBarItem.prominentHoverBackground"              : "",
-  "statusBarItem.remoteBackground"                      : "bg-completion",
-  "statusBarItem.remoteForeground"                      : "fg-main",
-  "statusBarItem.remoteHoverBackground"                 : "",
-  "statusBarItem.remoteHoverForeground"                 : "",
-  "statusBarItem.errorBackground"                       : "",
-  "statusBarItem.errorForeground"                       : "",
-  "statusBarItem.errorHoverBackground"                  : "",
-  "statusBarItem.errorHoverForeground"                  : "",
-  "statusBarItem.warningBackground"                     : "",
-  "statusBarItem.warningForeground"                     : "",
-  "statusBarItem.warningHoverBackground"                : "",
-  "statusBarItem.warningHoverForeground"                : "",
-  "statusBarItem.compactHoverBackground"                : "",
-  "statusBarItem.focusBorder"                           : "",
-  "statusBar.focusBorder"                               : "border",
-  "statusBarItem.offlineBackground"                     : "",
-  "statusBarItem.offlineForeground"                     : "",
-  "statusBarItem.offlineHoverForeground"                : "",
-  "statusBarItem.offlineHoverBackground"                : "",
+  // NOTE: As I understand it, the background color of Emacs' mode-line (or
+  // status bar) in Modus themes is *not* adjusted for accessibility purposes
+  // (e.g., simulating perception for color blindness). Instead, the color
+  // variation serves as a visual indicator of the selected variant - a kind of
+  // "badge" that says: "This is the Deuteranopia variant," rather than "This is
+  // adapted for Deuteranopia."
+  //
+  // Matter of fact, sidebar and list (explorer) backgrounds remain unchanged
+  // across variants, because their role is structural rather than
+  // variant-identifying.
+  //
+  // This asymmetry is deliberate. The default values already meet accessibility
+  // standards, so there is no need to alter them further.
+  //
+  "statusBar.background"                      : "bg-mode-line-active",
+  "statusBar.foreground"                      : "fg-mode-line-active",
+  "statusBar.border"                          : "",
+  "statusBar.debuggingBackground"             : "",
+  "statusBar.debuggingForeground"             : "",
+  "statusBar.debuggingBorder"                 : "",
+  "statusBar.noFolderForeground"              : "fg-mode-line-inactive", // FIXME: contrast clash with sidebar
+  "statusBar.noFolderBackground"              : "bg-mode-line-inactive", // FIXME: contrast clash with sidebar
+  "statusBar.noFolderBorder"                  : "",
+  "statusBarItem.activeBackground"            : "",
+  "statusBarItem.hoverForeground"             : "",
+  "statusBarItem.hoverBackground"             : "bg-hover",
+  "statusBarItem.prominentForeground"         : "",
+  "statusBarItem.prominentBackground"         : "",
+  "statusBarItem.prominentHoverForeground"    : "",
+  "statusBarItem.prominentHoverBackground"    : "",
+  "statusBarItem.remoteBackground"            : "",
+  "statusBarItem.remoteForeground"            : "",
+  "statusBarItem.remoteHoverBackground"       : "",
+  "statusBarItem.remoteHoverForeground"       : "",
+  "statusBarItem.errorBackground"             : "",
+  "statusBarItem.errorForeground"             : "",
+  "statusBarItem.errorHoverBackground"        : "",
+  "statusBarItem.errorHoverForeground"        : "",
+  "statusBarItem.warningBackground"           : "",
+  "statusBarItem.warningForeground"           : "",
+  "statusBarItem.warningHoverBackground"      : "",
+  "statusBarItem.warningHoverForeground"      : "",
+  "statusBarItem.compactHoverBackground"      : "",
+  "statusBarItem.focusBorder"                 : "",
+  "statusBar.focusBorder"                     : "",
+  "statusBarItem.offlineBackground"           : "",
+  "statusBarItem.offlineForeground"           : "",
+  "statusBarItem.offlineHoverForeground"      : "",
+  "statusBarItem.offlineHoverBackground"      : "",
 
   // Title Bar colors
   //
-  "titleBar.activeBackground"                           : "bg-dim",
-  "titleBar.activeForeground"                           : "fg-main",
-  "titleBar.inactiveBackground"                         : "",
-  "titleBar.inactiveForeground"                         : "",
-  "titleBar.border"                                     : "bg-inactive",
+  // NOTE: Inactive colors (i.e. inactiveBackground, inactiveForeground) are
+  // applied automatically by VS Code. These typically meet WCAG AA contrast
+  // levels, but not AAA. Since these states represent windows that are not in
+  // focus, it's debatable whether strict AAA contrast is necessary. As such, we
+  // defer to VS Code's defaults rather than overriding them, but this may
+  // change in the future.
+  //
+  "titleBar.activeBackground"                 : "title-bar.active-background",
+  "titleBar.activeForeground"                 : "title-bar.active-foreground",
+  "titleBar.inactiveBackground"               : "",
+  "titleBar.inactiveForeground"               : "",
+  "titleBar.border"                           : ""
 
   // Menu Bar colors
   //
-  "menubar.selectionForeground"                         : "fg-main",
-  "menubar.selectionBackground"                         : "bg-completion",
-  "menubar.selectionBorder"                             : "",
-  "menu.foreground"                                     : "fg-main",
-  "menu.background"                                     : "bg-main",
-  "menu.selectionForeground"                            : "fg-main",
-  "menu.selectionBackground"                            : "bg-completion",
-  "menu.selectionBorder"                                : "",
-  "menu.separatorBackground"                            : "bg-inactive",
-  "menu.border"                                         : "bg-inactive",
 
   // Command Center colors
   //
 
   // Notification colors
   //
-  "notificationCenter.border"                           : "bg-inactive",
-  "notificationCenterHeader.foreground"                 : "fg-main",
-  "notificationCenterHeader.background"                 : "bg-dim",
-  "notificationToast.border"                            : "bg-inactive",
-  "notifications.foreground"                            : "fg-main",
-  "notifications.background"                            : "bg-dim",
-  "notifications.border"                                : "bg-inactive",
-  "notificationLink.foreground"                         : "fg-link",
-  "notificationsErrorIcon.foreground"                   : "err",
-  "notificationsWarningIcon.foreground"                 : "warning",
-  "notificationsInfoIcon.foreground"                    : "info",
 
   // Banner colors
   //
-  "banner.background"                                   : "bg-dim",
-  "banner.foreground"                                   : "fg-main",
 
   // Extensions colors
   //
 
   // Quick picker colors
   //
-  "pickerGroup.border"                                  : "bg-inactive",
-  "pickerGroup.foreground"                              : "fg-main",
-  "quickInput.background"                               : "bg-dim",
-  "quickInput.foreground"                               : "fg-main",
-  "quickInputList.focusBackground"                      : "bg-completion",
-  "quickInputList.focusForeground"                      : "fg-main",
-  "quickInputList.focusIconForeground"                  : "",
-  "quickInputTitle.background"                          : "",
 
   // Keybinding label colors
   //
@@ -451,78 +286,9 @@
 
   // Integrated Terminal colors
   //
-  "terminal.background"                                 : "bg-main",
-  "terminal.border"                                     : "bg-inactive",
-  "terminal.foreground"                                 : "fg-main",
-  "terminal.ansiBlack"                                  : "fg-term-black",
-  "terminal.ansiBlue"                                   : "fg-term-blue",
-  "terminal.ansiBrightBlack"                            : "fg-term-black-bright",
-  "terminal.ansiBrightBlue"                             : "fg-term-blue-bright",
-  "terminal.ansiBrightCyan"                             : "fg-term-cyan-bright",
-  "terminal.ansiBrightGreen"                            : "fg-term-green-bright",
-  "terminal.ansiBrightMagenta"                          : "fg-term-magenta-bright",
-  "terminal.ansiBrightRed"                              : "fg-term-red-bright",
-  "terminal.ansiBrightWhite"                            : "fg-main",
-  "terminal.ansiBrightYellow"                           : "fg-term-yellow-bright",
-  "terminal.ansiCyan"                                   : "fg-term-cyan",
-  "terminal.ansiGreen"                                  : "fg-term-green",
-  "terminal.ansiMagenta"                                : "fg-term-magenta",
-  "terminal.ansiRed"                                    : "fg-term-red",
-  "terminal.ansiWhite"                                  : "fg-dim",
-  "terminal.ansiYellow"                                 : "fg-term-yellow",
-  "terminal.selectionBackground"                        : "bg-region",
-  "terminal.selectionForeground"                        : "",
-  "terminal.inactiveSelectionBackground"                : "",
-  "terminal.findMatchBackground"                        : "",
-  "terminal.findMatchBorder"                            : "",
-  "terminal.findMatchHighlightBackground"               : "",
-  "terminal.findMatchHighlightBorder"                   : "",
-  "terminal.hoverHighlightBackground"                   : "",
-  "terminalCursor.background"                           : "",
-  "terminalCursor.foreground"                           : "",
-  "terminal.dropBackground"                             : "",
-  "terminal.tab.activeBorder"                           : "",
-  "terminalCommandDecoration.defaultBackground"         : "",
-  "terminalCommandDecoration.successBackground"         : "",
-  "terminalCommandDecoration.errorBackground"           : "",
-  "terminalOverviewRuler.cursorForeground"              : "",
-  "terminalOverviewRuler.findMatchForeground"           : "",
-  "terminalStickyScroll.background"                     : "",
-  "terminalStickyScroll.border"                         : "",
-  "terminalStickyScrollHover.background"                : "",
-  "terminal.initialHintForeground"                      : "",
-  "terminalOverviewRuler.border"                        : "",
-  "terminalCommandGuide.foreground"                     : "",
-  "terminalSymbolIcon.aliasForeground"                  : "",
-  "terminalSymbolIcon.flagForeground"                   : "",
-  "terminalSymbolIcon.optionForeground"                 : "",
-  "terminalSymbolIcon.optionValueForeground"            : "",
-  "terminalSymbolIcon.methodForeground"                 : "",
-  "terminalSymbolIcon.argumentForeground"               : "",
-  "terminalSymbolIcon.inlineSuggestionForeground"       : "",
-  "terminalSymbolIcon.fileForeground"                   : "",
-  "terminalSymbolIcon.folderForeground"                 : "",
 
   // Debug colors
   //
-  "debugToolBar.background"                             : "bg-dim",
-  "debugToolBar.border"                                 : "bg-inactive",
-  "editor.stackFrameHighlightBackground"                : "",
-  "editor.focusedStackFrameHighlightBackground"         : "",
-  "editor.inlineValuesForeground"                       : "",
-  "editor.inlineValuesBackground"                       : "",
-  "debugView.exceptionLabelForeground"                  : "",
-  "debugView.exceptionLabelBackground"                  : "",
-  "debugView.stateLabelForeground"                      : "",
-  "debugView.stateLabelBackground"                      : "",
-  "debugView.valueChangedHighlight"                     : "",
-  "debugTokenExpression.name"                           : "",
-  "debugTokenExpression.value"                          : "",
-  "debugTokenExpression.string"                         : "",
-  "debugTokenExpression.boolean"                        : "",
-  "debugTokenExpression.number"                         : "",
-  "debugTokenExpression.error"                          : "",
-  "debugTokenExpression.type"                           : "",
 
   // Testing colors
   //
@@ -532,33 +298,9 @@
 
   // Git colors
   //
-  "gitDecoration.addedResourceForeground"               : "fg-added",
-  "gitDecoration.modifiedResourceForeground"            : "fg-changed",
-  "gitDecoration.deletedResourceForeground"             : "fg-removed",
-  "gitDecoration.renamedResourceForeground"             : "fg-added-intense",
-  "gitDecoration.stageModifiedResourceForeground"       : "fg-changed-intense",
-  "gitDecoration.stageDeletedResourceForeground"        : "fg-removed-intense",
-  "gitDecoration.untrackedResourceForeground"           : "fg-alt",
-  "gitDecoration.ignoredResourceForeground"             : "fg-dim",
-  "gitDecoration.conflictingResourceForeground"         : "bg-removed-fringe",
-  "gitDecoration.submoduleResourceForeground"           : "bg-changed-fringe",
-  "git.blame.editorDecorationForeground"                : "fg-changed",
 
   // Source Control Graph colors
   //
-  "scmGraph.historyItemHoverLabelForeground"            : "fg-main",
-  "scmGraph.foreground1"                                : "rainbow-1",
-  "scmGraph.foreground2"                                : "rainbow-2",
-  "scmGraph.foreground3"                                : "rainbow-3",
-  "scmGraph.foreground4"                                : "rainbow-4",
-  "scmGraph.foreground5"                                : "rainbow-5",
-  "scmGraph.historyItemHoverAdditionsForeground"        : "fg-added-intense",
-  "scmGraph.historyItemHoverDeletionsForeground"        : "fg-removed-intense",
-  "scmGraph.historyItemRefColor"                        : "accent-0",
-  "scmGraph.historyItemRemoteRefColor"                  : "accent-1",
-  "scmGraph.historyItemBaseRefColor"                    : "accent-3",
-  "scmGraph.historyItemHoverDefaultLabelForeground"     : "fg-dim",
-  "scmGraph.historyItemHoverDefaultLabelBackground"     : "bg-diff-context"
 
   // Settings Editor colors
   //

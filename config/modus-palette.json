@@ -1,28 +1,37 @@
 {
   "variants": {
     "modus-operandi": {
-      "bg-title-bar-active": "bg-mode-line-active"
+      "title-bar.active-background"       : "#d7d7d7",
+      "title-bar.active-foreground"       : "fg-main"
+
     },
     "modus-vivendi": {
-      "bg-title-bar-active": "bg-mode-line-active"
+      "title-bar.active-background"       : "#3f3f3f",
+      "title-bar.active-foreground"       : "fg-main"
     },
     "modus-operandi-tinted": {
-      "bg-title-bar-active": "bg-mode-line-active"
+      "title-bar.active-background"       : "#d7ccc6",
+      "title-bar.active-foreground"       : "fg-main"
     },
     "modus-vivendi-tinted": {
-      "bg-title-bar-active": "bg-mode-line-active"
+      "title-bar.active-background"       : "#353a52",
+      "title-bar.active-foreground"       : "fg-main"
     },
     "modus-operandi-deuteranopia": {
-      "bg-title-bar-active": "#c8c8c8"
+      "title-bar.active-background"       : "#d7d7d7",
+      "title-bar.active-foreground"       : "fg-main"
     },
     "modus-vivendi-deuteranopia": {
-      "bg-title-bar-active": "#505050"
+      "title-bar.active-background"       : "#3f3f3f",
+      "title-bar.active-foreground"       : "fg-main"
     },
     "modus-operandi-tritanopia": {
-      "bg-title-bar-active": "#c8c8c8"
+      "title-bar.active-background"       : "#d7d7d7",
+      "title-bar.active-foreground"       : "fg-main"
     },
     "modus-vivendi-tritanopia": {
-      "bg-title-bar-active": "#505050"
+      "title-bar.active-background"       : "#3f3f3f",
+      "title-bar.active-foreground"       : "fg-main"
     }
   }
 }
