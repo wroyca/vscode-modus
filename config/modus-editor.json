@@ -415,6 +415,22 @@
 
   // Source Control Graph colors
   //
+  // TODO: Revisit these colors to ensure they are accessible and visually
+  // appealing.
+  //
+  "scmGraph.historyItemHoverLabelForeground"        : "bg-main",
+  "scmGraph.foreground1"                            : "rainbow-1",
+  "scmGraph.foreground2"                            : "rainbow-2",
+  "scmGraph.foreground3"                            : "rainbow-3",
+  "scmGraph.foreground4"                            : "rainbow-4",
+  "scmGraph.foreground5"                            : "rainbow-5",
+  "scmGraph.historyItemHoverAdditionsForeground"    : "fg-added",
+  "scmGraph.historyItemHoverDeletionsForeground"    : "fg-removed",
+  "scmGraph.historyItemRefColor"                    : "rainbow-7",
+  "scmGraph.historyItemRemoteRefColor"              : "rainbow-8",
+  "scmGraph.historyItemBaseRefColor"                : "rainbow-0",
+  "scmGraph.historyItemHoverDefaultLabelForeground" : "fg-main",
+  "scmGraph.historyItemHoverDefaultLabelBackground" : "bg-dim"
 
   // Settings Editor colors
   //
