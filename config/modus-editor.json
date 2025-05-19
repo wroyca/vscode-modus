@@ -145,7 +145,7 @@
   "tab.activeBorderTop"                       : "",
   "tab.unfocusedActiveBorderTop"              : "",
   "tab.lastPinnedBorder"                      : "",
-  "tab.inactiveBackground"                    : "bg-inactive",
+  "tab.inactiveBackground"                    : "tab.inactive-background",
   "tab.unfocusedInactiveBackground"           : "",
   "tab.inactiveForeground"                    : "",
   "tab.unfocusedActiveForeground"             : "",
