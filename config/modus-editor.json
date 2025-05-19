@@ -314,6 +314,20 @@
 
   // Peek view colors
   //
+  "peekView.border"                                 : "accent-0",
+  "peekViewEditor.background"                       : "accent-0@0.1",
+  "peekViewEditorGutter.background"                 : "",
+  "peekViewEditor.matchHighlightBackground"         : "bg-hover-secondary",
+  "peekViewEditor.matchHighlightBorder"             : "",
+  "peekViewResult.background"                       : "bg-dim",
+  "peekViewResult.fileForeground"                   : "",
+  "peekViewResult.lineForeground"                   : "fg-dim",
+  "peekViewResult.matchHighlightBackground"         : "bg-hover-secondary",
+  "peekViewResult.selectionBackground"              : "",
+  "peekViewResult.selectionForeground"              : "",
+  "peekViewTitle.background"                        : "",
+  "peekViewTitleDescription.foreground"             : "",
+  "peekViewTitleLabel.foreground"                   : "",
 
   // Merge conflicts colors
   //
