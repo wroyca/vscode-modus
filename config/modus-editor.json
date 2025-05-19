@@ -329,6 +329,14 @@
 
   // Quick picker colors
   //
+  "pickerGroup.border"                              : "border",
+  "pickerGroup.foreground"                          : "fg-main",
+  "quickInput.background"                           : "bg-dim",
+  "quickInput.foreground"                           : "fg-main",
+  "quickInputList.focusBackground"                  : "bg-hover",
+  "quickInputList.focusForeground"                  : "fg-main",
+  "quickInputList.focusIconForeground"              : "fg-main",
+  "quickInputTitle.background"                      : "",
 
   // Keybinding label colors
   //
